@@ -1,0 +1,13 @@
+= YuZJ Process Profiler, version 2
+
+This project is a user-level general-purposed process profiler based on process filesystem (procfs). It mainly consists of 3 small subprojects:
+
+. link:./libprocfs-java/[`libprocfs-java`], a Java-based `procfs` reader.
+. link:./process-info-collector/[`process-info-collector`], a Java-based process profiler.
+. link:./process-info-analyzer/[`process-info-analyzer`], a Python-based process analyzation framework for data collected in the collector.
+
+== Requirements
+
+If you would like to profile some process, you need JDK >= 17.
+
+If you need to analyze others' profiling result, please refer to the `requirement.txt` or `conda_env.yaml` file at `process-info-analyzer`.
