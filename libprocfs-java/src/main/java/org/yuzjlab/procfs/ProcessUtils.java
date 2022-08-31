@@ -4,6 +4,9 @@ import java.lang.management.ManagementFactory;
 
 public class ProcessUtils {
 
+    private ProcessUtils() {
+    }
+
     public static long getCurrentPid() {
         var runtime = ManagementFactory.getRuntimeMXBean();
         return runtime.getPid(); // format: "pid@hostname"

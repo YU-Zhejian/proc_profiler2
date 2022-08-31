@@ -10,14 +10,6 @@ import java.util.stream.StreamSupport;
 
 public class SystemInfo {
 
-    public Iterator<Integer> iterAllPids() throws IOException {
-        return new AllPidIterator();
-    }
-
-    public int getNumberOfProcesses(){
-        return 0;
-    }
-
     public static void main(String[] args) throws IOException {
         System.out.println("INIT");
         try (var it = new AllPidIterator()) {
@@ -27,6 +19,14 @@ public class SystemInfo {
             }
         }
         System.out.println("FIN");
+    }
+
+    public Iterator<Integer> iterAllPids() throws IOException {
+        return new AllPidIterator();
+    }
+
+    public int getNumberOfProcesses() {
+        return 0;
     }
 
 }
@@ -45,10 +45,11 @@ class AllPidIterator implements Iterator<Integer>, AutoCloseable {
                     int i = -1;
                     try {
                         i = Integer.parseInt(p.getFileName().toString());
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                     return i;
-                }).
-                filter((Integer i) -> (i != -1))
+                })
+                .filter((Integer i) -> (i != -1))
                 .iterator();
     }
 

@@ -715,3 +715,6 @@ dmypy.json
 cython_debug/
 
 /libprocfs-java/.idea/uiDesigner.xml
+
+## SonarLint
+sonarlint/
