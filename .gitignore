@@ -534,8 +534,10 @@ fabric.properties
 # Ignore Gradle GUI config
 gradle-app.setting
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+# Gradle wrapper jar file ignored.
+
+# No need to work on Microsoft Windows
+gradlew.bat
 
 # Cache of project
 .gradletasknamecache

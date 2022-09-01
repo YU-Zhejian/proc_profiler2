@@ -1,0 +1,4 @@
+rootProject.name = 'proc_profiler2'
+
+include 'libprocfs-java'
+include 'process-into-collector'
