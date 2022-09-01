@@ -1,18 +1,11 @@
 = Requirement Analysis for `libprocfs-java`
 
-The `libprocfs-java` is a Java library designed to provide low-level process and kernel information by patsing GNU/Linux Process Filesystem (`procfs`) and `sysfs`.
+== The Software Engineering Exploration Project
 
-The library is low-level and no caching is provided inside this library. For higher performance you may implement the caching system yourself.
+This project is designed to solve following important software engineering problems:
 
-This library will contain documentations from following sources:
-
-. Linux Kernel documentation on link:https://docs.kernel.org/filesystems/sysfs.html[`sysfs`] and link:https://docs.kernel.org/filesystems/proc.html[`procfs`].
-. GNU/Linux manual pages link:https://www.man7.org/linux/man-pages/man5/procfs.5.html[`procfs(5)`] and link:https://man7.org/linux/man-pages/man5/sysfs.5.html[`sysfs(5)`].
-. The Linux Documentation Program (TLDP) documenattion for link:https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/proc.html[`procfs`].
-
-This library is inspired and would reference code from following sources:
-
-. The link:https://psutil.readthedocs.io/en/latest[`psutil`] Python package.
-. The link:https://pkg.go.dev/github.com/prometheus/procfs[`procfs`] Go package by link:https://prometheus.io/[Prometheus], a monitoring system.
-. The link:https://docs.rs/procfs/latest/procfs/[`procfs`] Rust crate.
-. The link:https://metacpan.org/pod/Solaris::Procfs[`Solaris::Procfs`] Perl package.
+. This project will use log libraries.
+.. How to arrange these libraries to avoid stopping downstream users from selecting their favorite log libraries?
+.. How to arrange logging configuration files that enables downstream user to customize the logging system used in this project?
+. This project includes kernel processes, how to make them tested?
+. How to design and implement an exception system that is easy to use by end users?

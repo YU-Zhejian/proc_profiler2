@@ -1,0 +1,14 @@
+= Design for `process-info-collector`
+
+== Other Unclasified Thoughts
+
+Purposed database systems:
+
+. link:http://hsqldb.org/index.html[HSQLDB]
+. link:https://firebirdsql.org/en/start/[Firebird]
+. link:https://sqlite.org[SQLite]
+
+Database Abstraction:
+
+. link:https://mybatis.org/[MyBatis]
+. link:https://hibernate.org/[Hibernate]

@@ -2,9 +2,7 @@ package org.yuzjlab.procfs;
 
 
 import org.yuzjlab.procfs._internal.ProcfsInternalUtils;
-import org.yuzjlab.procfs.exception.ProcessNotExistException;
-import org.yuzjlab.procfs.exception.ProcessPermissionDeniedException;
-import org.yuzjlab.procfs.exception.ProcessUnknownException;
+import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +22,7 @@ public class ProcessInfo {
      * pid -- Process ID
      */
     protected final long pid;
+
     /**
      * A String of path in procfs. For example, <code>/proc/1</code>
      */
@@ -37,7 +36,7 @@ public class ProcessInfo {
         this.fileInProcfs = new File(this.pathStrInProcfs);
     }
 
-    public static void main(String[] args) throws IOException, ProcessPermissionDeniedException, ProcessUnknownException, ProcessNotExistException {
+    public static void main(String[] args) throws IOException, ProcessBaseException {
         var p = new ProcessInfo(ProcessUtils.getCurrentPid());
         System.out.println(p.getPid());
         System.out.println(Arrays.toString(p.getCmdLine()));
@@ -48,7 +47,7 @@ public class ProcessInfo {
         return this.fileInProcfs.exists();
     }
 
-    private Path getItemRealPath(String name) throws ProcessNotExistException, ProcessPermissionDeniedException, ProcessUnknownException {
+    private Path getItemRealPath(String name) throws ProcessBaseException {
         try {
             return Path.of(String.format("%s/%s", this.pathStrInProcfs, name)).toRealPath();
         } catch (IOException e) {
@@ -57,11 +56,11 @@ public class ProcessInfo {
 
     }
 
-    public Path getExePath() throws ProcessNotExistException, ProcessPermissionDeniedException, ProcessUnknownException {
+    public Path getExePath() throws ProcessBaseException {
         return getItemRealPath("exe");
     }
 
-    public Path getCwdPath() throws ProcessNotExistException, ProcessPermissionDeniedException, ProcessUnknownException {
+    public Path getCwdPath() throws ProcessBaseException {
         return getItemRealPath("cwd");
     }
 
