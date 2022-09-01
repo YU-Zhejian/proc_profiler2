@@ -1,7 +1,32 @@
 = Requirement Analysis for the Entire Project
+:author: YU Zhejian <Zhejian.19@intl.zju.edu.cn>
+:revnumber: 0.1.0
+:source-highlighter: pygments
+:toc: left
+:sectnums:
+:stem: latexmath
+:pdf-page-size: a4
+:icons: font
+
+An link:https://doi.org/10.1109/IEEESTD.2018.8559686[ISO/IEC/IEEE 29148 2018.11] documentation.
+
+This documentation should be read for all people who are (interested in) development of `proc_profiler2`, as it defines user and system requirements.
+
+WARNING: This documentation is not designed for users of `proc_profiler2`.
 
 == Introduction to the Problem
 
-== Review of Existing Similiar Tools
+A profiler is need to assist following tasks:
+
+. Profile applications developed by our lab, which may identify its weakness;
+. Profile applications used in benchmarking paper to assess their algorithm complexity.
+
+The profiler should start with certain application process, trace down its subprocesses, and terminates when the traced process is terminated.
+
+The profiler should work in either user space or kernel space, i.e., it should work with or without root privilege.
+
+The profiler should be usable in all major GNU/Linux distributions regardless of architecture and kernel version. There is no requirement for it to work on other POSIX-compliant UNIX(-like) operating systems or Microsoft Windows.
+
+== Review of Existing Similar Tools
 
 == Conclusion
