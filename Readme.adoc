@@ -10,4 +10,4 @@ This project is a user-level general-purposed process profiler based on process 
 
 If you would like to profile some process, you need JDK >= 17.
 
-If you need to analyze others' profiling result, please refer to the `requirement.txt` or `conda_env.yaml` file at `process-info-analyzer`.
+If you need to analyze others' profiling result, please refer to the link:./process-info-analyzer/requirements.txt[`requirements.txt`] or `conda_env.yaml` file at `process-info-analyzer`.

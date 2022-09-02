@@ -7,6 +7,7 @@ Purposed database systems:
 . link:http://hsqldb.org/index.html[HSQLDB]
 . link:https://firebirdsql.org/en/start/[Firebird]
 . link:https://sqlite.org[SQLite]
+. link:http://h2database.com/html/main.html[H2]
 
 Database Abstraction:
 

@@ -8,13 +8,29 @@
 :pdf-page-size: a4
 :icons: font
 
-An link:https://doi.org/10.1109/IEEESTD.2018.8559686[ISO/IEC/IEEE 29148 2018.11] documentation.
+Targeted population::
+This document is designed for those who:
+. Are developing the software, or;
+. Are acquirers who give requirements.
 
-This documentation should be read for all people who are (interested in) development of `proc_profiler2`, as it defines user and system requirements.
+Assumptions::
+The reader should be comfortable in working with GNU/Linux operating system.
 
-WARNING: This documentation is not designed for users of `proc_profiler2`.
+Version History::
+* 0.1.0 The initial version
 
-== Introduction to the Problem
+Abstract::
+This documentation defines the requirement analysis results of `proc_profiler2`, a process profiler which can trace and profile computer processes. It also defines baselines to the implementation and evolutions that may occur.
+
+== Terms & Definitions
+
+Profiling session::
+A profiling session is the process of running the profiler on one process.
+
+[#_acquirers_requirements]
+== Acquirers' Requirements
+
+NOTE: In this part we would define requirements produced by the acquirers in a general verbal way.
 
 A profiler is need to assist following tasks:
 
@@ -26,6 +42,34 @@ The profiler should start with certain application process, trace down its subpr
 The profiler should work in either user space or kernel space, i.e., it should work with or without root privilege.
 
 The profiler should be usable in all major GNU/Linux distributions regardless of architecture and kernel version. There is no requirement for it to work on other POSIX-compliant UNIX(-like) operating systems or Microsoft Windows.
+
+The software should be relatively easy to use.
+
+The requirement analysing, designing, implementing, testing, integrating, delivering and deploying process of this software should provide examples to similar software engineering tasks.
+
+== System Requirement Specifications
+
+NOTE: this part would give precise requirements for designers, developers, testers and maintainers.
+
+From <<_acquirers_requirements>>, we can divide the system into 2 subsystems: The profiler and data analyzing framework.
+
+=== Profiler
+
+=== Data Analyzing Framework
+
+The data analyzing framework should have the following abilities:
+
+Convert collected data in arbitrary format to one row-oriented format to support downstream analysis::
+pass
+
+Aggregate the session-level details to one process group::
+pass
+
+Perform session-session comparison with several time-series operations like scaling::
+pass
+
+Perform joint analysis between profiler results and logging results::
+pass
 
 == Review of Existing Similar Tools
 
