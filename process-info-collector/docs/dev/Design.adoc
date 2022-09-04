@@ -1,6 +1,6 @@
 = Design for `process-info-collector`
 
-== Other Unclasified Thoughts
+== Other Unclassified Thoughts
 
 Purposed database systems:
 

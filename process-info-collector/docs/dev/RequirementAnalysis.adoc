@@ -1,0 +1,62 @@
+= Requirement Analysis for `process-info-collector`
+:author: YU Zhejian <Zhejian.19@intl.zju.edu.cn>
+:revnumber: 0.1.0
+:source-highlighter: pygments
+:toc: left
+:sectnums:
+:stem: latexmath
+:pdf-page-size: a4
+:icons: font
+
+Targeted population::
+This document is designed for those who:
+. Are developing the software, or;
+. Are acquirers who give requirements.
+
+Assumptions::
+The reader should be comfortable in working with GNU/Linux operating system. Recommended for reader to have Object-Oriented Programming (OOP) experience.
+
+Version History::
+* 0.1.0 The initial version
+
+Abstract::
+This documentation defines the requirement analysis results of `process-info-collector`, the process information collector that supports asynchronous automatic trace of child processes and plugins. It also defines baselines to the implementation and evolutions that may occur.
+
+== Terms & Definitions
+
+
+[#_acquirers_requirements]
+== Acquirers' Requirements
+
+NOTE: In this part we would define requirements produced by the acquirers in a general verbal way.
+
+There should be a part of profiler that is placed alongside the application which should be profiled, collect metrics during execution and have it persistent through databases.
+
+The profiler application should be a minimal single-JAR executable which does not require other third-party JARs except plugins, if possible, to ensure easy deployment.
+
+The profiler application should persist the collected data in databases. The database should be in-premise database, i.e., it does not require a server to be started in advance.
+
+The profiler application should be able to run in a long time for those long-running applications. For example, a week.
+
+The profiler application should accept configuration in environment variables, commandline arguments & parameters, and configuration files in human-readable format.
+
+The profiler should be able to profile application that spawns/forks lots of subprocesses, and the user may choose to trace or not to trace these subprocesses.
+
+The profiler should not consume too much computational responses even in the highest resolution, which might require a highly efficient caching system.
+
+The database should be readable even if the profiler itself was terminated inappropriately. For example, killed by SIGKILL (9).
+
+== System Requirement Specifications
+
+NOTE: this part would give precise requirements for designers, developers, testers and maintainers.
+
+
+=== The Collection Module
+
+=== The Frontend
+
+=== The Configure Parsing Module
+
+=== The Appender
+
+The appender should append
