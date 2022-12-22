@@ -4,13 +4,15 @@
 
 The `libprocfs-java` is a Java library designed to provide low-level process and kernel information by parsing GNU/Linux Process Filesystem (`procfs`) and `sysfs`.
 
-The library is low-level and no caching is provided inside this library. For higher performance you may implement the caching system yourself.
+The library is low-level and no caching is provided inside this library.
+For higher performance you may implement the caching system yourself.
 
 == Referenced Documentations and Projects
 
 This library will contain documentations from following sources:
 
-. Linux Kernel documentation on link:https://docs.kernel.org/filesystems/sysfs.html[`sysfs`] and link:https://docs.kernel.org/filesystems/proc.html[`procfs`]. For Debian GNU/Linux users, that would be link:file:///usr/share/doc/linux-doc/html/filesystems/sysfs.html[`sysfs`] and link:file:///usr/share/doc/linux-doc/html/filesystems/proc.html[`procfs`].
+. Linux Kernel documentation on link:https://docs.kernel.org/filesystems/sysfs.html[`sysfs`] and link:https://docs.kernel.org/filesystems/proc.html[`procfs`].
+For Debian GNU/Linux users, that would be link:file:///usr/share/doc/linux-doc/html/filesystems/sysfs.html[`sysfs`] and link:file:///usr/share/doc/linux-doc/html/filesystems/proc.html[`procfs`].
 . GNU/Linux manual pages link:https://www.man7.org/linux/man-pages/man5/procfs.5.html[`procfs(5)`] and link:https://man7.org/linux/man-pages/man5/sysfs.5.html[`sysfs(5)`].
 . The Linux Documentation Program (TLDP) documentation for link:https://tldp.org/LDP/Linux-Filesystem-Hierarchy/html/proc.html[`procfs`].
 

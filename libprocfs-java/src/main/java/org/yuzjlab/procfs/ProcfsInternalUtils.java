@@ -1,4 +1,4 @@
-package org.yuzjlab.procfs._internal;
+package org.yuzjlab.procfs;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.exception.ProcessNotExistException;
@@ -10,8 +10,6 @@ import java.io.IOException;
 import java.nio.file.AccessDeniedException;
 
 public class ProcfsInternalUtils {
-    private ProcfsInternalUtils() {
-    }
 
     public static ProcessBaseException resolveIOException(IOException e) {
         if (e instanceof FileNotFoundException fileNotFoundException) {

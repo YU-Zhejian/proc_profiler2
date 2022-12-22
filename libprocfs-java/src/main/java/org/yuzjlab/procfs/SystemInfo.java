@@ -5,7 +5,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
-import java.util.function.Consumer;
 import java.util.stream.StreamSupport;
 
 public class SystemInfo {
@@ -13,15 +12,14 @@ public class SystemInfo {
     public static void main(String[] args) throws IOException {
         System.out.println("INIT");
         try (var it = new AllPidIterator()) {
-            while (it.hasNext()) {
-                int pid = it.next();
+            for (int pid : it) {
                 System.out.println(pid);
             }
         }
         System.out.println("FIN");
     }
 
-    public Iterator<Integer> iterAllPids() throws IOException {
+    public Iterable<Integer> iterAllPids() throws IOException {
         return new AllPidIterator();
     }
 
@@ -31,7 +29,7 @@ public class SystemInfo {
 
 }
 
-class AllPidIterator implements Iterator<Integer>, AutoCloseable {
+class AllPidIterator implements Iterable<Integer>, AutoCloseable {
 
     private final Iterator<Integer> iterator;
     private final DirectoryStream<Path> dstream;
@@ -53,23 +51,14 @@ class AllPidIterator implements Iterator<Integer>, AutoCloseable {
                 .iterator();
     }
 
-    @Override
-    public boolean hasNext() {
-        return iterator.hasNext();
-    }
-
-    @Override
-    public Integer next() {
-        return iterator.next();
-    }
-
-    @Override
-    public void forEachRemaining(Consumer<? super Integer> action) {
-        this.iterator.forEachRemaining(action);
-    }
 
     @Override
     public void close() throws IOException {
         this.dstream.close();
+    }
+
+    @Override
+    public Iterator<Integer> iterator() {
+        return this.iterator;
     }
 }

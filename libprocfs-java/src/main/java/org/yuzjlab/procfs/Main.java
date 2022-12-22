@@ -1,11 +1,13 @@
 package org.yuzjlab.procfs;
 
 import org.slf4j.LoggerFactory;
+import org.yuzjlab.procfs.exception.ProcessBaseException;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ProcessBaseException {
         var systemProperties = System.getProperties();
         var lh = LoggerFactory.getLogger("Test");
 
@@ -29,6 +31,12 @@ public class Main {
                 systemProperties.get("java.vendor"),
                 systemProperties.get("java.home")
         );
+
+        var p = new ProcessInfo(ProcessUtils.getCurrentPid());
+        System.out.println(p.getPid());
+        System.out.println(Arrays.toString(p.getCmdLine()));
+        System.out.println(p.getExePath());
+        System.out.println(p.getStat().toString());
 
         lh.error("ERR!");
     }
