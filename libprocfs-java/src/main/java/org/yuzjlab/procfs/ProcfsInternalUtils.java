@@ -11,6 +11,10 @@ import java.nio.file.AccessDeniedException;
 
 public class ProcfsInternalUtils {
 
+    private ProcfsInternalUtils(){
+
+    }
+
     public static ProcessBaseException resolveIOException(IOException e) {
         if (e instanceof FileNotFoundException fileNotFoundException) {
             return new ProcessNotExistException(fileNotFoundException);

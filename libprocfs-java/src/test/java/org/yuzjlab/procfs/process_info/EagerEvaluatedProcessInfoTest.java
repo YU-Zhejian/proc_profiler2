@@ -1,6 +1,7 @@
-package org.yuzjlab.procfs;
+package org.yuzjlab.procfs.process_info;
 
 import org.junit.jupiter.api.Test;
+import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 import java.io.IOException;
@@ -8,12 +9,12 @@ import java.nio.file.Path;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class ProcessInfoTest {
-    private final ProcessInfo p;
+class EagerEvaluatedProcessInfoTest {
+    private final EagerEvaluatedProcessInfo p;
     private final ProcessHandle ph;
 
-    ProcessInfoTest() throws ProcessBaseException {
-        this.p = new ProcessInfo(ProcessUtils.getCurrentPid());
+    EagerEvaluatedProcessInfoTest() throws ProcessBaseException {
+        this.p = new EagerEvaluatedProcessInfo(ProcessUtils.getCurrentPid());
         this.ph = ProcessHandle.current();
     }
 

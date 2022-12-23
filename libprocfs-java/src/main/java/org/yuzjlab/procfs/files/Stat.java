@@ -12,71 +12,309 @@ import java.util.Scanner;
 
 /**
  * <code>/proc/[pid]/stat</code>
+ * <p>
+ * Descriptions from <a href="https://man7.org/linux/man-pages/man5/proc.5.html">manual pages</a>.
+ * <p>
+ * <i>/proc/[pid]/stat</i>
+ * Status information about the process.  This is used by <code>ps(1)</code>.
+ * It is defined in the kernel source file <i>fs/proc/array.c</i>.
+ * <p>
+ * The fields, in order, with their proper <code>scanf(3)</code> format specifiers, are listed below.
+ * Whether or not certain of these fields display valid information is governed by a ptrace access mode
+ * <b>PTRACE_MODE_READ_FSCREDS </b>|<b>PTRACE_MODE_NOAUDIT</b>chec
+ * (refer to <code>ptrace(2)</code>).
+ * If the check denies access, then the field value is displayed as 0.
+ * The affected fields are indicated with the marking
+ * [PT].
+ * <p>
  */
 public final class Stat {
 
-    private final long pid;
-    private final String comm;
-    private final char state;
-    private final long ppid;
-    private final long pgrp;
-    private final long session;
-    private final long ttyNr;
-    private final long tpgid;
-    private final int flags;
-//    private final long minflt;
-//    private final long cminflt;
-//    private final long majflt;
-//    private final long cmajflt;
-//    private final long utime;
-//    private final long stime;
-//    private final long cutime;
-//    private final long cstime;
-//    private final int priority;
-//    private final int nice;
-//    private final int numThreads;
-//    private final int itrealvalue;
-//    private final int starttime;
-//    private final int vsize;
-//    private final int rss;
-//    private final long rsslim;
-//    private final long startcode;
-//    private final long endcode;
-//    private final long startstack;
-//    private final long kstkesp;
-//    private final long kstkeip;
-//    private final long signal;
-//    private final long blocked;
-//    private final long sigignore;
-//    private final long sigcatch;
-//    private final long wchan;
-//    private final long nswap;
-//    private final long cnswap;
-//    private final int exitSignal;
-//    private final int processor;
-//    private final int rtPriority;
-//    private final int policy;
-//    private final long delayacctBlkioTicks;
-//    private final long guestTime;
-//    private final long cguestTime;
-//    private final long startData;
-//    private final long endData;
-//    private final long startBrk;
-//    private final long argStart;
-//    private final long argEnd;
-//    private final long envStart;
-//    private final long envEnd;
-//    private final long exitCode;
+    /**
+     * The process ID.
+     */
+    public final long pid;
+    /**
+     * The filename of the executable, in parentheses.
+     * Strings longer than <b>TASK_COMM_LEN </b>(16) characters (including the terminating null byte) are silently truncated.
+     * This is visible whether or not the executable is swapped out.
+     */
+    public final String comm;
+
+    /**
+     * One of the following characters, indicating process state:
+     * <p>
+     * R  Running
+     * <p>
+     * S  Sleeping in an interruptible wait
+     * <p>
+     * D  Waiting in uninterruptible disk sleep
+     * <p>
+     * Z  Zombie
+     * <p>
+     * T  Stopped (on a signal) or (before Linux 2.6.33)
+     * trace stopped
+     * <p>
+     * t  Tracing stop (Linux 2.6.33 onward)
+     * <p>
+     * W  Paging (only before Linux 2.6.0)
+     * <p>
+     * X  Dead (from Linux 2.6.0 onward)
+     * <p>
+     * x  Dead (Linux 2.6.33 to 3.13 only)
+     * <p>
+     * K  Wakekill (Linux 2.6.33 to 3.13 only)
+     * <p>
+     * W  Waking (Linux 2.6.33 to 3.13 only)
+     * <p>
+     * P  Parked (Linux 3.9 to 3.13 only)
+     */
+    public final char state;
+    /**
+     * The PID of the parent of this process.
+     */
+    public final long ppid;
+    /**
+     * The process group ID of the process.
+     */
+    public final long pgrp;
+    /**
+     * The session ID of the process.
+     */
+    public final long session;
+    /**
+     * The controlling terminal of the process.
+     * (The minor device number is contained in the combination of bits 31 to 20 and 7 to 0;
+     * the major device number is in bits 15 to 8.)
+     */
+    public final long ttyNr;
+    /**
+     * The ID of the foreground process group of the controlling terminal of the process.
+     */
+    public final long tpgid;
+    /**
+     * The kernel flags word of the process.
+     * For bit meanings, see the PF_* defines in the Linux kernel source file <i>include/linux/sched.h</i>.
+     * Details depend on the kernel version.
+     */
+    public final int flags;
+    /**
+     * The number of minor faults the process has made which have not required loading a memory page from disk.
+     */
+    public final long minflt;
+    /**
+     * The number of minor faults that the process's waited-for children have made
+     */
+    public final long cminflt;
+    /**
+     * The number of major faults the process has made which have required loading a memory page from disk.
+     */
+    public final long majflt;
+    /**
+     * The number of major faults that the process's waited-for children have made.
+     */
+    public final long cmajflt;
+    /**
+     * Amount of time that this process has been scheduled in user mode,
+     * measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     * This includes guest time, <i>guest_time</i> (time spent running a virtual CPU, see below),
+     * so that applications that are not aware of the guest time field do not lose that time from their calculations.
+     */
+    public final long utime;
+    /**
+     * Amount of time that this process has been scheduled in kernel mode,
+     * measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     */
+    public final long stime;
+    /**
+     * Amount of time that this process's waited-for children have been scheduled in user mode,
+     * measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>). (See also <code>times(2)</code>.)
+     * This includes guest time, <i>cguest_time</i> (time spent running a virtual CPU, see below).
+     */
+    public final long cutime;
+    /**
+     * Amount of time that this process's waited-for children have been scheduled in kernel mode,
+     * measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     */
+    public final long cstime;
+    /**
+     * (Explanation for Linux 2.6)
+     * For processes running a real-time scheduling policy (<i>policy</i> below;
+     * see <code>sched_setscheduler(2)</code>),
+     * this is the negated scheduling priority, minus one;
+     * that is, a number in the range -2 to -100, corresponding to real-time priorities 1 to 99.
+     * For processes running under a non-real-time scheduling policy,
+     * this is the raw nice value (<code>setpriority(2)</code>) as represented in the kernel.
+     * The kernel stores nice values as numbers in the range 0 (high) to 39 (low),
+     * corresponding to the user-visible nice range of -20 to 19.
+     * <p>
+     * Before Linux 2.6, this was a scaled value based on the scheduler weighting given to this process.
+     */
+    public final int priority;
+    /**
+     * The nice value (see <code>setpriority(2)</code>), a value in the range 19 (low priority) to -20 (high priority).
+     */
+    public final int nice;
+    /**
+     * Number of threads in this process (since Linux 2.6).
+     * Before kernel 2.6, this field was hard coded to 0 as a placeholder for an earlier removed field.
+     */
+    public final int numThreads;
+    /**
+     * The time in jiffies before the next <b>SIGALRM </b>is sent to the process due to an interval timer.
+     * Since kernel 2.6.17, this field is no longer maintained, and is hard coded as 0.
+     */
+    public final int itrealvalue;
+    /**
+     * The time the process started after system boot.
+     * In kernels before Linux 2.6, this value was expressed  in jiffies.
+     * Since Linux 2.6, the value is expressed in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     */
+    public final int starttime;
+    /**
+     * Virtual memory size in bytes.
+     */
+    public final int vsize;
+    /**
+     * Resident Set Size: number of pages the process has in real memory.
+     * This is just the pages which count toward text, data, or stack space.
+     * This does not include pages which have not been demand-loaded in, or which are swapped out.
+     * This value is inaccurate; see <i>/proc/[pid]/statm</i> below.
+     */
+    public final int rss;
+    /**
+     * Current soft limit in bytes on the rss of the process;
+     * see the description of <b>RLIMIT_RSS </b>in <code>getrlimit(2)</code>.
+     */
+    public final long rsslim;
+    /**
+     * The address above which program text can run.
+     */
+    public final long startcode;
+    /**
+     * The address below which program text can run.
+     */
+    public final long endcode;
+    /**
+     * The address of the start (i.e., bottom) of the stack.
+     */
+    public final long startstack;
+    /**
+     * The current value of ESP (stack pointer), as found in the kernel stack page for the process.
+     */
+    public final long kstkesp;
+    /**
+     * The current EIP (instruction pointer).
+     */
+    public final long kstkeip;
+    /**
+     * The bitmap of pending signals, displayed as a decimal number.
+     * Obsolete, because it does not provide information on real-time signals;
+     * use <i>/proc/[pid]/status</i> instead.
+     */
+    public final long signal;
+    /**
+     * The bitmap of blocked signals, displayed as a decimal number.
+     * Obsolete, because it does not provide information on real-time signals; use
+     * <i>/proc/[pid]/status</i> instead.
+     */
+    public final long blocked;
+    /**
+     * The bitmap of ignored signals, displayed as a decimal number.
+     * Obsolete, because it does not provide information on real-time signals;
+     * use <i>/proc/[pid]/status</i> instead.
+     */
+    public final long sigignore;
+    /**
+     * The bitmap of caught signals, displayed as a decimal number.
+     * Obsolete, because it does not provide information on real-time signals;
+     * use <i>/proc/[pid]/status</i> instead.
+     */
+    public final long sigcatch;
+    /**
+     * This is the "channel" in which the process is waiting.
+     * It is the address of a location in the kernel where the process is sleeping.
+     * The corresponding symbolic name can be found in <i>/proc/[pid]/wchan</i>.
+     */
+    public final long wchan;
+    /**
+     * Number of pages swapped (not maintained).
+     */
+    public final long nswap;
+    /**
+     * Cumulative <i>nswap</i> for child processes (not maintained).
+     */
+    public final long cnswap;
+    /**
+     * Signal to be sent to parent when we die.
+     */
+    public final int exitSignal;
+    /**
+     * CPU number last executed on.
+     */
+    public final int processor;
+    /**
+     * Real-time scheduling priority, a number in the range 1 to 99 for processes scheduled under a real-time policy,
+     * or 0, for non-real-time processes (see <code>sched_setscheduler(2)</code>).
+     */
+    public final int rtPriority;
+    /**
+     * Scheduling policy (see <code>sched_setscheduler(2)</code>).
+     * Decode using the SCHED_* constants in <i>linux/sched.h</i>.
+     */
+    public final int policy;
+    /**
+     * Aggregated block I/O delays, measured in clock ticks (centiseconds).
+     */
+    public final long delayacctBlkioTicks;
+    /**
+     * Guest time of the process (time spent running a virtual CPU for a guest operating system),
+     * measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     */
+    public final long guestTime;
+    /**
+     *  Guest time of the process's children, measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     */
+    public final long cguestTime;
+    /**
+     * Address above which program initialized and uninitialized (BSS) data are placed.
+     */
+    public final long startData;
+    /**
+     * Address below which program initialized and uninitialized (BSS) data are placed.
+     */
+    public final long endData;
+    /**
+     * Address above which program heap can be expanded  with <code>brk(2)</code>.
+     */
+    public final long startBrk;
+    /**
+     * Address above which program command-line arguments (<i>argv</i>) are placed.
+     */
+    public final long argStart;
+    /**
+     * Address below program command-line arguments (<i>argv</i>) are placed.
+     */
+    public final long argEnd;
+    /**
+     * Address above which program environment is placed.
+     */
+    public final long envStart;
+    /**
+     * Address below which program environment is placed.
+     */
+    public final long envEnd;
+    /**
+     * The thread's exit status in the form reported by <code>waitpid(2)</code>.
+     */
+    public final long exitCode;
 
 
-    public Stat(Path pathToStats) throws ProcessBaseException {
-        Scanner scn;
-        try {
-            scn = new Scanner(new FileInputStream(pathToStats.toFile()));
-        } catch (IOException e) {
-            throw ProcfsInternalUtils.resolveIOException(e);
-        }
-        try {
+    /**
+     * @param pathToStat Path to the stat file that would be parsed.
+     */
+    public Stat(Path pathToStat) throws ProcessBaseException {
+        try (Scanner scn = new Scanner(new FileInputStream(pathToStat.toFile()))) {
             this.pid = scn.nextLong();
             this.comm = scn.next();
             this.state = scn.next().charAt(0);
@@ -86,46 +324,73 @@ public final class Stat {
             this.ttyNr = scn.nextLong();
             this.tpgid = scn.nextLong();
             this.flags = scn.nextInt();
+            this.minflt = scn.nextInt();
+            this.cminflt = scn.nextInt();
+            this.majflt = scn.nextInt();
+            this.cmajflt = scn.nextInt();
+            this.utime = scn.nextLong();
+            this.stime = scn.nextLong();
+            this.cutime = scn.nextLong();
+            this.cstime = scn.nextLong();
+            this.priority = scn.nextInt();
+            this.nice = scn.nextInt();
+            this.numThreads = scn.nextInt();
+            this.itrealvalue = scn.nextInt();
+            this.starttime = scn.nextInt();
+            this.vsize = scn.nextInt();
+            this.rss = scn.nextInt();
+            this.rsslim = scn.nextLong();
+            this.startcode = scn.nextLong();
+            this.endcode = scn.nextLong();
+            this.startstack = scn.nextLong();
+            this.kstkesp = scn.nextLong();
+            this.kstkeip = scn.nextLong();
+            this.signal = scn.nextLong();
+            this.blocked = scn.nextLong();
+            this.sigignore = scn.nextLong();
+            this.sigcatch = scn.nextLong();
+            this.wchan = scn.nextLong();
+            this.nswap = scn.nextLong();
+            this.cnswap = scn.nextLong();
+            this.exitSignal = scn.nextInt();
+            this.processor = scn.nextInt();
+            this.rtPriority = scn.nextInt();
+            this.policy = scn.nextInt();
+            this.delayacctBlkioTicks = scn.nextLong();
+            this.guestTime = scn.nextLong();
+            this.cguestTime = scn.nextLong();
+            this.startData = scn.nextLong();
+            this.endData = scn.nextLong();
+            this.startBrk = scn.nextLong();
+            this.argStart = scn.nextLong();
+            this.argEnd = scn.nextLong();
+            this.envStart = scn.nextLong();
+            this.envEnd = scn.nextLong();
+            this.exitCode = scn.nextLong();
+        } catch (IOException e) {
+            throw ProcfsInternalUtils.resolveIOException(e);
         } catch (NoSuchElementException e) {
             throw new ProcessUnknownException(e);
         }
-        scn.close();
-    }
-
-    public long getPid() {
-        return pid;
-    }
-
-    public String getComm() {
-        return comm;
-    }
-
-    public char getState() {
-        return state;
-    }
-
-    public long getPpid() {
-        return ppid;
-    }
-
-    public long getPgrp() {
-        return pgrp;
-    }
-
-    public long getSession() {
-        return session;
     }
 
     @Override
     public String toString() {
-        return String.valueOf(pid) + ' ' +
-                comm + ' ' +
-                state + ' ' +
-                ppid + ' ' +
-                pgrp + ' ' +
-                session + ' ' +
-                ttyNr + ' ' +
-                tpgid + ' ' +
-                flags + ' ';
+        return String.join(
+                " ",
+                String.valueOf(pid),
+                comm,
+                String.valueOf(state),
+                String.valueOf(ppid),
+                String.valueOf(pgrp),
+                String.valueOf(session),
+                String.valueOf(ttyNr),
+                String.valueOf(tpgid),
+                String.valueOf(flags),
+                String.valueOf(minflt),
+                String.valueOf(cminflt),
+                String.valueOf(majflt),
+                String.valueOf(cmajflt) // TODO
+        );
     }
 }

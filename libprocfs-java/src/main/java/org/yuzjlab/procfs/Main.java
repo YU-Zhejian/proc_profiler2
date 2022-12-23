@@ -2,6 +2,7 @@ package org.yuzjlab.procfs;
 
 import org.slf4j.LoggerFactory;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
+import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -32,7 +33,7 @@ public class Main {
                 systemProperties.get("java.home")
         );
 
-        var p = new ProcessInfo(ProcessUtils.getCurrentPid());
+        var p = new EagerEvaluatedProcessInfo(ProcessUtils.getCurrentPid());
         System.out.println(p.getPid());
         System.out.println(Arrays.toString(p.getCmdLine()));
         System.out.println(p.getExePath());
