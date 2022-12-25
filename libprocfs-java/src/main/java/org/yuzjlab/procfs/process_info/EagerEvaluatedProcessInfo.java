@@ -4,12 +4,12 @@ package org.yuzjlab.procfs.process_info;
 import org.yuzjlab.procfs.ProcfsInternalUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.Environ;
+import org.yuzjlab.procfs.files.FD;
 import org.yuzjlab.procfs.files.Stat;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -94,8 +94,13 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public HashMap<Integer, String> getFileDescriptors() {
-        return new HashMap<>(); // TODO
+    public Map<Integer, String> getFileDescriptors() throws ProcessBaseException {
+        return FD.parseFD(Path.of(this.pathInProcfs.toString(), "fd"));
+    }
+
+    @Override
+    public long getNumberOfFileDescriptors() throws ProcessBaseException {
+        return FD.getNumberOfFD(Path.of(this.pathInProcfs.toString(), "fd"));
     }
 
     @Override

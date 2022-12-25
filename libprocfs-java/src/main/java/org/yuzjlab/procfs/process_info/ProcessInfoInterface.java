@@ -4,7 +4,6 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.Stat;
 
 import java.nio.file.Path;
-import java.util.HashMap;
 import java.util.Map;
 
 public interface ProcessInfoInterface {
@@ -66,7 +65,9 @@ public interface ProcessInfoInterface {
 
     float getCPUPercent(float waitNSeconds);
 
-    HashMap<Integer, String> getFileDescriptors();
+    Map<Integer, String> getFileDescriptors() throws ProcessBaseException;
+
+    long getNumberOfFileDescriptors() throws ProcessBaseException;
 
     void getIO();
 

@@ -6,7 +6,7 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 import java.io.FileNotFoundException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EnvironTest {
 
