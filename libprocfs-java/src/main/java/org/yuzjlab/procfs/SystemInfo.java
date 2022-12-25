@@ -1,61 +1,82 @@
 package org.yuzjlab.procfs;
 
+import org.yuzjlab.procfs.exception.ProcessBaseException;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class SystemInfo {
+public final class SystemInfo {
 
-    public static void main(String[] args) throws IOException {
-        System.out.println("INIT");
-        try (var it = new AllPidIterator()) {
-            for (int pid : it) {
-                System.out.println(pid);
-            }
+    private SystemInfo() {
+    }
+
+    public static Iterable<Integer> iterAllPids() throws ProcessBaseException {
+        try {
+            return new AllPidIterator();
+        } catch (IOException e) {
+            throw ProcfsInternalUtils.resolveIOException(e);
         }
-        System.out.println("FIN");
     }
 
-    public Iterable<Integer> iterAllPids() throws IOException {
-        return new AllPidIterator();
-    }
-
-    public int getNumberOfProcesses() {
-        return 0; // TODO
+    public static long getNumberOfProcesses() throws ProcessBaseException {
+        try (var aps = new AllPidStream()) {
+            return aps.getStream().count();
+        } catch (IOException e) {
+            throw ProcfsInternalUtils.resolveIOException(e);
+        }
     }
 
 }
 
-class AllPidIterator implements Iterable<Integer>, AutoCloseable {
-
-    private final Iterator<Integer> iterator;
+class AllPidStream implements AutoCloseable {
     private final DirectoryStream<Path> dstream;
 
-    public AllPidIterator() throws IOException {
-        var dir = Path.of("/proc/");
+    public AllPidStream() throws IOException {
+        var dir = Path.of("/", "proc");
         this.dstream = Files.newDirectoryStream(dir);
-        this.iterator = StreamSupport.stream(dstream.spliterator(), true)
+    }
+
+    public Stream<Integer> getStream() {
+        return StreamSupport.stream(dstream.spliterator(), true)
                 .filter((Path p) -> (p.toFile().isDirectory()))
                 .map((Path p) -> {
                     int i = -1;
                     try {
                         i = Integer.parseInt(p.getFileName().toString());
-                    } catch (NumberFormatException ignored){
+                    } catch (NumberFormatException ignored) {
                         //
                     }
                     return i;
                 })
-                .filter((Integer i) -> (i != -1))
-                .iterator();
+                .filter((Integer i) -> (i != -1));
+    }
+
+    @Override
+    public void close() throws IOException {
+        this.dstream.close();
+    }
+}
+
+
+class AllPidIterator implements Iterable<Integer>, AutoCloseable {
+
+    private final Iterator<Integer> iterator;
+    private final AllPidStream allPidStream;
+
+    public AllPidIterator() throws IOException {
+        this.allPidStream = new AllPidStream();
+        this.iterator = this.allPidStream.getStream().iterator();
     }
 
 
     @Override
     public void close() throws IOException {
-        this.dstream.close();
+        this.allPidStream.close();
     }
 
     @Override

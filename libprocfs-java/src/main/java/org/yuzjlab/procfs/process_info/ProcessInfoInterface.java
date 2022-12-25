@@ -5,6 +5,7 @@ import org.yuzjlab.procfs.files.Stat;
 
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 
 public interface ProcessInfoInterface {
     /**
@@ -33,9 +34,13 @@ public interface ProcessInfoInterface {
     String[] getCmdLine() throws ProcessBaseException;
 
     /**
-     * Get all environment variables
+     * Get all environment variables in Map,
+     * with environment variable name as key and environment variable value as value.
+     * <p>
+     * WARNING: This map would only represent the state when the process is started.
+     * It would <i>not</i> be changed if the executable inside changed its environment by system calls.
      */
-    HashMap<String, String> getEnvironmentVariables() throws ProcessBaseException;
+    Map<String, String> getEnvironmentVariables() throws ProcessBaseException;
 
     /**
      * Get PID of parent process
@@ -43,7 +48,9 @@ public interface ProcessInfoInterface {
     long getPPID() throws ProcessBaseException;
 
     /**
-     * Get process name
+     * Get process name.
+     * <p>
+     * The process name should be the executable name trimmed to 16 characters.
      */
     String getName() throws ProcessBaseException;
 
@@ -67,7 +74,7 @@ public interface ProcessInfoInterface {
 
     Stat getStat() throws ProcessBaseException;
 
-    void getStatus();
+    char getState() throws ProcessBaseException;
 
     @Override
     int hashCode();

@@ -3,14 +3,14 @@ package org.yuzjlab.procfs.process_info;
 
 import org.yuzjlab.procfs.ProcfsInternalUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
+import org.yuzjlab.procfs.files.Environ;
 import org.yuzjlab.procfs.files.Stat;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.stream.StreamSupport;
+import java.util.Map;
 
 /**
  * The Process Class
@@ -45,8 +45,8 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public HashMap<String, String> getEnvironmentVariables() throws ProcessBaseException {
-        return new HashMap<>(); // TODO
+    public Map<String, String> getEnvironmentVariables() throws ProcessBaseException {
+        return Environ.parseEnviron(Path.of(this.pathInProcfs.toString(), "environ"));
     }
 
     @Override
@@ -114,8 +114,8 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public void getStatus() {
-        // TODO
+    public char getState() throws ProcessBaseException {
+        return this.getStat().state;
     }
 
 }
