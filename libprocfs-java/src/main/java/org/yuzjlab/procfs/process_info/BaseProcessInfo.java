@@ -45,6 +45,7 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
         }
     }
 
+
     @Override
     public int hashCode() {
         return Objects.hash(pid);

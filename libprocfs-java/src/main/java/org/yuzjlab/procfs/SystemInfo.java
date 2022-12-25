@@ -43,7 +43,9 @@ class AllPidIterator implements Iterable<Integer>, AutoCloseable {
                     int i = -1;
                     try {
                         i = Integer.parseInt(p.getFileName().toString());
-                    } catch (NumberFormatException ignored){}
+                    } catch (NumberFormatException ignored){
+                        //
+                    }
                     return i;
                 })
                 .filter((Integer i) -> (i != -1))

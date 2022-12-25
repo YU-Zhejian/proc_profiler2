@@ -4,7 +4,6 @@ import org.slf4j.LoggerFactory;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 public class Main {
@@ -34,10 +33,9 @@ public class Main {
         );
 
         var p = new EagerEvaluatedProcessInfo(ProcessUtils.getCurrentPid());
-        System.out.println(p.getPid());
-        System.out.println(Arrays.toString(p.getCmdLine()));
-        System.out.println(p.getExePath());
-        System.out.println(p.getStat().toString());
+        lh.error("{}", p.getPid());
+        lh.error("{}", String.join(" ", p.getCmdLine()));
+        lh.error("{}", p.getExePath());
 
         lh.error("ERR!");
     }

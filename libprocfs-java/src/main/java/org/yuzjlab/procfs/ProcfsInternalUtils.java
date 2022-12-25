@@ -11,8 +11,7 @@ import java.nio.file.AccessDeniedException;
 
 public class ProcfsInternalUtils {
 
-    private ProcfsInternalUtils(){
-
+    private ProcfsInternalUtils() {
     }
 
     public static ProcessBaseException resolveIOException(IOException e) {

@@ -53,7 +53,7 @@ public interface ProcessInfoInterface {
 
     int getNumChildProcess();
 
-    int getOnWhichCPU();
+    int getOnWhichCPU() throws ProcessBaseException;
 
     float getCPUTime();
 

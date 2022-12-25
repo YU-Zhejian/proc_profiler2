@@ -4,5 +4,6 @@ import java.io.FileNotFoundException;
 
 public class ProcessNotExistException extends ProcessBaseException {
     public ProcessNotExistException(FileNotFoundException e) {
+        super(e);
     }
 }

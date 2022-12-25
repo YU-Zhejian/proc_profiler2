@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.stream.StreamSupport;
 
 /**
  * The Process Class
@@ -54,8 +56,11 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
 
     @Override
     public String getName() throws ProcessBaseException {
-        // "/proc/$$/comm"
-        return "";
+        try {
+            return Files.readString(Path.of(this.pathInProcfs.toString(), "comm"));
+        } catch (IOException e) {
+            throw ProcfsInternalUtils.resolveIOException(e);
+        }
     }
 
     @Override
@@ -74,8 +79,8 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public int getOnWhichCPU() {
-        return 0; // TODO
+    public int getOnWhichCPU() throws ProcessBaseException {
+        return this.getStat().processor;
     }
 
     @Override

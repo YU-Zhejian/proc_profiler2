@@ -2,10 +2,11 @@ package org.yuzjlab.procfs.files;
 
 import org.yuzjlab.procfs.ProcfsInternalUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
-import org.yuzjlab.procfs.exception.ProcessUnknownException;
+import org.yuzjlab.procfs.exception.ProcessFileParsingException;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -174,31 +175,31 @@ public final class Stat {
     /**
      * Virtual memory size in bytes.
      */
-    public final int vsize;
+    public final BigInteger vsize;
     /**
      * Resident Set Size: number of pages the process has in real memory.
      * This is just the pages which count toward text, data, or stack space.
      * This does not include pages which have not been demand-loaded in, or which are swapped out.
      * This value is inaccurate; see <i>/proc/[pid]/statm</i> below.
      */
-    public final int rss;
+    public final BigInteger rss;
     /**
      * Current soft limit in bytes on the rss of the process;
      * see the description of <b>RLIMIT_RSS </b>in <code>getrlimit(2)</code>.
      */
-    public final long rsslim;
+    public final BigInteger rsslim;
     /**
      * The address above which program text can run.
      */
-    public final long startcode;
+    public final BigInteger startcode;
     /**
      * The address below which program text can run.
      */
-    public final long endcode;
+    public final BigInteger endcode;
     /**
      * The address of the start (i.e., bottom) of the stack.
      */
-    public final long startstack;
+    public final BigInteger startstack;
     /**
      * The current value of ESP (stack pointer), as found in the kernel stack page for the process.
      */
@@ -230,7 +231,7 @@ public final class Stat {
      * Obsolete, because it does not provide information on real-time signals;
      * use <i>/proc/[pid]/status</i> instead.
      */
-    public final long sigcatch;
+    public final BigInteger sigcatch;
     /**
      * This is the "channel" in which the process is waiting.
      * It is the address of a location in the kernel where the process is sleeping.
@@ -273,37 +274,37 @@ public final class Stat {
      */
     public final long guestTime;
     /**
-     *  Guest time of the process's children, measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
+     * Guest time of the process's children, measured in clock ticks (divide by <i>sysconf(_SC_CLK_TCK)</i>).
      */
     public final long cguestTime;
     /**
      * Address above which program initialized and uninitialized (BSS) data are placed.
      */
-    public final long startData;
+    public final BigInteger startData;
     /**
      * Address below which program initialized and uninitialized (BSS) data are placed.
      */
-    public final long endData;
+    public final BigInteger endData;
     /**
      * Address above which program heap can be expanded  with <code>brk(2)</code>.
      */
-    public final long startBrk;
+    public final BigInteger startBrk;
     /**
      * Address above which program command-line arguments (<i>argv</i>) are placed.
      */
-    public final long argStart;
+    public final BigInteger argStart;
     /**
      * Address below program command-line arguments (<i>argv</i>) are placed.
      */
-    public final long argEnd;
+    public final BigInteger argEnd;
     /**
      * Address above which program environment is placed.
      */
-    public final long envStart;
+    public final BigInteger envStart;
     /**
      * Address below which program environment is placed.
      */
-    public final long envEnd;
+    public final BigInteger envEnd;
     /**
      * The thread's exit status in the form reported by <code>waitpid(2)</code>.
      */
@@ -311,6 +312,8 @@ public final class Stat {
 
 
     /**
+     * Default initializer.
+     *
      * @param pathToStat Path to the stat file that would be parsed.
      */
     public Stat(Path pathToStat) throws ProcessBaseException {
@@ -337,18 +340,18 @@ public final class Stat {
             this.numThreads = scn.nextInt();
             this.itrealvalue = scn.nextInt();
             this.starttime = scn.nextInt();
-            this.vsize = scn.nextInt();
-            this.rss = scn.nextInt();
-            this.rsslim = scn.nextLong();
-            this.startcode = scn.nextLong();
-            this.endcode = scn.nextLong();
-            this.startstack = scn.nextLong();
+            this.vsize = scn.nextBigInteger();
+            this.rss = scn.nextBigInteger();
+            this.rsslim = scn.nextBigInteger();
+            this.startcode = scn.nextBigInteger();
+            this.endcode = scn.nextBigInteger();
+            this.startstack = scn.nextBigInteger();
             this.kstkesp = scn.nextLong();
             this.kstkeip = scn.nextLong();
             this.signal = scn.nextLong();
             this.blocked = scn.nextLong();
             this.sigignore = scn.nextLong();
-            this.sigcatch = scn.nextLong();
+            this.sigcatch = scn.nextBigInteger();
             this.wchan = scn.nextLong();
             this.nswap = scn.nextLong();
             this.cnswap = scn.nextLong();
@@ -359,18 +362,18 @@ public final class Stat {
             this.delayacctBlkioTicks = scn.nextLong();
             this.guestTime = scn.nextLong();
             this.cguestTime = scn.nextLong();
-            this.startData = scn.nextLong();
-            this.endData = scn.nextLong();
-            this.startBrk = scn.nextLong();
-            this.argStart = scn.nextLong();
-            this.argEnd = scn.nextLong();
-            this.envStart = scn.nextLong();
-            this.envEnd = scn.nextLong();
+            this.startData = scn.nextBigInteger();
+            this.endData = scn.nextBigInteger();
+            this.startBrk = scn.nextBigInteger();
+            this.argStart = scn.nextBigInteger();
+            this.argEnd = scn.nextBigInteger();
+            this.envStart = scn.nextBigInteger();
+            this.envEnd = scn.nextBigInteger();
             this.exitCode = scn.nextLong();
         } catch (IOException e) {
             throw ProcfsInternalUtils.resolveIOException(e);
         } catch (NoSuchElementException e) {
-            throw new ProcessUnknownException(e);
+            throw new ProcessFileParsingException(e);
         }
     }
 
@@ -390,7 +393,46 @@ public final class Stat {
                 String.valueOf(minflt),
                 String.valueOf(cminflt),
                 String.valueOf(majflt),
-                String.valueOf(cmajflt) // TODO
-        );
+                String.valueOf(cmajflt),
+                String.valueOf(utime),
+                String.valueOf(stime),
+                String.valueOf(cutime),
+                String.valueOf(cstime),
+                String.valueOf(priority),
+                String.valueOf(nice),
+                String.valueOf(numThreads),
+                String.valueOf(itrealvalue),
+                String.valueOf(starttime),
+                String.valueOf(vsize),
+                String.valueOf(rss),
+                String.valueOf(rsslim),
+                String.valueOf(startcode),
+                String.valueOf(endcode),
+                String.valueOf(startstack),
+                String.valueOf(kstkesp),
+                String.valueOf(kstkeip),
+                String.valueOf(signal),
+                String.valueOf(blocked),
+                String.valueOf(sigignore),
+                String.valueOf(sigcatch),
+                String.valueOf(wchan),
+                String.valueOf(nswap),
+                String.valueOf(cnswap),
+                String.valueOf(exitSignal),
+                String.valueOf(processor),
+                String.valueOf(rtPriority),
+                String.valueOf(policy),
+                String.valueOf(delayacctBlkioTicks),
+                String.valueOf(guestTime),
+                String.valueOf(cguestTime),
+                String.valueOf(startData),
+                String.valueOf(endData),
+                String.valueOf(startBrk),
+                String.valueOf(argStart),
+                String.valueOf(argEnd),
+                String.valueOf(envStart),
+                String.valueOf(envEnd),
+                String.valueOf(exitCode)
+        ) + "\n";
     }
 }
