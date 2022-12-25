@@ -76,13 +76,4 @@ public interface ProcessInfoInterface {
     Stat getStat() throws ProcessBaseException;
 
     char getState() throws ProcessBaseException;
-
-    @Override
-    int hashCode();
-
-    @Override
-    boolean equals(Object o);
-
-    @Override
-    String toString();
 }
