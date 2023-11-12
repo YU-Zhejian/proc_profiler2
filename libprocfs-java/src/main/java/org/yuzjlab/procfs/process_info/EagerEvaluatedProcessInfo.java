@@ -10,7 +10,11 @@ import org.yuzjlab.procfs.files.Stat;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.stream.StreamSupport;
+
 
 /**
  * The Process Class
@@ -69,13 +73,30 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public Iterable<Integer> getChildPIDs() {
-        return null; // TODO
+    public Iterable<Integer> getChildPIDs() throws ProcessBaseException {
+        HashSet<Integer> pids = new HashSet<>();
+        try (var fs = Files.newDirectoryStream(Path.of(this.pathInProcfs.toString(), "task"))) {
+            for (var thread_dir_path : fs) {
+                try {
+                    pids.addAll(
+                            Arrays
+                                    .stream(Files.readString(Path.of(thread_dir_path.toString(), "children")).split(" "))
+                                    .filter((String _s) -> !_s.isEmpty())
+                                    .map(Integer::parseInt)
+                                    .toList()
+                    );
+                } catch (IOException ignored) {
+                }
+            }
+            return pids;
+        } catch (IOException e) {
+            throw ProcfsInternalUtils.resolveIOException(e);
+        }
     }
 
     @Override
-    public int getNumChildProcess() {
-        return 0; //TODO
+    public long getNumChildProcess() throws ProcessBaseException {
+        return StreamSupport.stream(this.getChildPIDs().spliterator(), false).count();
     }
 
     @Override
@@ -84,13 +105,20 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public float getCPUTime() {
-        return 0; // TODO
+    public float getCPUTime() throws ProcessBaseException {
+        var stat = this.getStat();
+        return stat.utime + stat.stime;
     }
 
     @Override
-    public float getCPUPercent(float waitNSeconds) {
-        return 0; // TODO
+    public float getCPUPercent(float waitNSeconds) throws ProcessBaseException {
+        float cpuTimeAtStart = this.getCPUTime();
+        try {
+            wait((int) (waitNSeconds * 1000));
+        } catch (InterruptedException ignored) {
+        }
+        float cpuTimeAtEnd = this.getCPUTime();
+        return (cpuTimeAtEnd - cpuTimeAtStart) / waitNSeconds;
     }
 
     @Override

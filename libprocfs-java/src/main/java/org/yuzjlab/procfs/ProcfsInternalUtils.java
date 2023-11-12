@@ -8,6 +8,7 @@ import org.yuzjlab.procfs.exception.ProcessUnknownException;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.AccessDeniedException;
+import java.nio.file.NoSuchFileException;
 
 public class ProcfsInternalUtils {
 
@@ -18,6 +19,10 @@ public class ProcfsInternalUtils {
         if (e instanceof FileNotFoundException fileNotFoundException) {
             return new ProcessNotExistException(fileNotFoundException);
         }
+        if (e instanceof NoSuchFileException noSuchFileException) {
+            return new ProcessNotExistException(noSuchFileException);
+        }
+
         if (e instanceof AccessDeniedException accessDeniedException) {
             return new ProcessPermissionDeniedException(accessDeniedException);
         }

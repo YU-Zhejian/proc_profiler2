@@ -79,7 +79,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public int getNumChildProcess() {
+    public long getNumChildProcess() {
         return 0; // TODO
     }
 
@@ -89,8 +89,8 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public float getCPUTime() {
-        return 0;// TODO
+    public float getCPUTime() throws ProcessBaseException {
+        return 0; // TODO
     }
 
     @Override

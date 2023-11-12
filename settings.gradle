@@ -1,4 +1,7 @@
 rootProject.name = 'proc_profiler2'
 
-include 'libprocfs-java'
-include 'process-into-collector'
+include ':libprocfs-java'
+include ':process-info-collector'
+
+project(':libprocfs-java').projectDir = "$rootDir/libprocfs-java" as File
+project(':process-info-collector').projectDir = "$rootDir/process-info-collector" as File

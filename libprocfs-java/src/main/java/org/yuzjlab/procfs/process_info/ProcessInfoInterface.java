@@ -55,15 +55,15 @@ public interface ProcessInfoInterface {
 
     void getMemoryMap();
 
-    Iterable<Integer> getChildPIDs();
+    Iterable<Integer> getChildPIDs() throws ProcessBaseException;
 
-    int getNumChildProcess();
+    long getNumChildProcess() throws ProcessBaseException;
 
     int getOnWhichCPU() throws ProcessBaseException;
 
-    float getCPUTime();
+    float getCPUTime() throws ProcessBaseException;
 
-    float getCPUPercent(float waitNSeconds);
+    float getCPUPercent(float waitNSeconds) throws ProcessBaseException;
 
     Map<Integer, String> getFileDescriptors() throws ProcessBaseException;
 

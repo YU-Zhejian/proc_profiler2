@@ -5,15 +5,18 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
 
 import java.util.Objects;
+import java.util.stream.StreamSupport;
 
 public class Main {
     public static void main(String[] args) throws ProcessBaseException {
+        System.err.println("Running libprocfs-java testing code ...");
         var systemProperties = System.getProperties();
-        var lh = LoggerFactory.getLogger("Test");
+        var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
+
 
         var osName = systemProperties.get("os.name");
         if (!Objects.equals(osName, "Linux")) {
-            lh.warn("Detected operating system {}, which is not Linux", osName);
+            lh.warn("Detected operating system '{}', which is not Linux", osName);
         }
 
         var osArch = systemProperties.get("os.arch");
@@ -22,9 +25,9 @@ public class Main {
         }
 
         var osVer = systemProperties.get("os.version");
-        lh.error("OS: {} {} ver. {}", osName, osArch, osVer);
-        lh.error(
-                "Java: {} ver. {} (Spec. ver. {}) by {} with JAVAHOME={}",
+        lh.info("OS: '{}' arch. {} ver. '{}'", osName, osArch, osVer);
+        lh.info(
+                "Java: '{}' ver. '{}' (Spec. ver. {}) by '{}' with JAVAHOME='{}'",
                 systemProperties.get("java.runtime.name"),
                 systemProperties.get("java.version"),
                 systemProperties.get("java.specification.version"),
@@ -33,10 +36,20 @@ public class Main {
         );
 
         var p = new EagerEvaluatedProcessInfo(ProcessUtils.getCurrentPid());
-        lh.error("{}", p.getPid());
-        lh.error("{}", String.join(" ", p.getCmdLine()));
-        lh.error("{}", p.getExePath());
-
-        lh.error("ERR!");
+        lh.info("PID: {}", p.getPid());
+        lh.info("CMDLINE: {}", String.join(" ", p.getCmdLine()));
+        lh.info("EXEPATH: {}", p.getExePath());
+        lh.info(
+                "CHILDREN ({}): {}",
+                p.getNumChildProcess(),
+                String.join(
+                        " ",
+                        StreamSupport
+                                .stream(p.getChildPIDs().spliterator(), false)
+                                .map(String::valueOf)
+                                .toList()
+                )
+        );
+        System.err.println("Running libprocfs-java testing code FINISHED");
     }
 }
