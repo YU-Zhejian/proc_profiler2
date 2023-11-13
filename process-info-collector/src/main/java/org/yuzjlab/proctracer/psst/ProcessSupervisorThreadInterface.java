@@ -1,6 +1,8 @@
 package org.yuzjlab.proctracer.psst;
 
-public interface ProcessSupervisorThreadInterface extends Runnable{
+import org.yuzjlab.proctracer.utils.ThreadInterface;
+
+public interface ProcessSupervisorThreadInterface extends ThreadInterface {
     long getPid();
     int getExitValue();
     void kill(int signal);

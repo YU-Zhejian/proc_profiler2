@@ -1,8 +1,8 @@
 package org.yuzjlab.procfs.process_info;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
-import org.yuzjlab.procfs.files.IO;
-import org.yuzjlab.procfs.files.Stat;
+import org.yuzjlab.procfs.files.ProcPidIo;
+import org.yuzjlab.procfs.files.ProcPidStat;
 import org.yuzjlab.procfs.helper.Field;
 
 import java.nio.file.Path;
@@ -14,7 +14,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     protected float expireTime;
     protected String[] cmdLineCache;
     protected Path cwdPathCache;
-    protected Field<Stat> statCache;
+    protected Field<ProcPidStat> statCache;
     protected Field<Map<Integer, String>> fileDescriptorsCache;
     protected Field<Long> numberOfFileDescriptorCache;
     protected Field<Map<String, String>> environmentVariableCache;
@@ -121,7 +121,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public IO getIO() {
+    public ProcPidIo getIO() {
 // TODO
         return null;
     }
@@ -132,7 +132,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public Stat getStat() throws ProcessBaseException {
+    public ProcPidStat getStat() throws ProcessBaseException {
         if (this.statCache == null) {
             this.statCache = new Field<>(
                     this.eepi::getStat, this.expireTime

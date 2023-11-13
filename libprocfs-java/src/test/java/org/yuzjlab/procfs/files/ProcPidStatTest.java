@@ -9,12 +9,12 @@ import java.nio.file.Files;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class StatTest {
+class ProcPidStatTest {
 
     @Test
     void assertRead() throws ProcessBaseException, IOException {
         var statPath = new TestHelper().resolveResources("/stat.txt");
-        var stat = new Stat(statPath);
+        var stat = new ProcPidStat(statPath);
         var fileStr = new String(Files.readAllBytes(statPath));
         assertEquals(fileStr, stat.toString());
     }

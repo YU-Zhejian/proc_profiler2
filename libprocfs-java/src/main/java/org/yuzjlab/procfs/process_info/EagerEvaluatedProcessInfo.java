@@ -3,11 +3,11 @@ package org.yuzjlab.procfs.process_info;
 
 import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
-import org.yuzjlab.procfs.files.Environ;
-import org.yuzjlab.procfs.files.FD;
-import org.yuzjlab.procfs.files.IO;
-import org.yuzjlab.procfs.files.MMap;
-import org.yuzjlab.procfs.files.Stat;
+import org.yuzjlab.procfs.files.ProcPidEnviron;
+import org.yuzjlab.procfs.files.ProcPidFd;
+import org.yuzjlab.procfs.files.ProcPidIo;
+import org.yuzjlab.procfs.files.ProcPidMaps;
+import org.yuzjlab.procfs.files.ProcPidStat;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -54,7 +54,7 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
 
     @Override
     public Map<String, String> getEnvironmentVariables() throws ProcessBaseException {
-        return Environ.parseEnviron(Path.of(this.pathInProcfs.toString(), "environ"));
+        return ProcPidEnviron.parseEnviron(Path.of(this.pathInProcfs.toString(), "environ"));
     }
 
     @Override
@@ -73,7 +73,7 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
 
     @Override
     public Iterable<String> getMemoryMap()throws ProcessBaseException {
-        return MMap.parseMMap(Path.of(this.pathInProcfs.toString(), "map_files"));
+        return ProcPidMaps.parseMMap(Path.of(this.pathInProcfs.toString(), "map_files"));
     }
 
     private List<Integer> getChildPidsFromThreadDir(Path threadDirPath) {
@@ -134,17 +134,17 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
 
     @Override
     public Map<Integer, String> getFileDescriptors() throws ProcessBaseException {
-        return FD.parseFD(Path.of(this.pathInProcfs.toString(), "fd"));
+        return ProcPidFd.parseFD(Path.of(this.pathInProcfs.toString(), "fd"));
     }
 
     @Override
     public long getNumberOfFileDescriptors() throws ProcessBaseException {
-        return FD.getNumberOfFD(Path.of(this.pathInProcfs.toString(), "fd"));
+        return ProcPidFd.getNumberOfFD(Path.of(this.pathInProcfs.toString(), "fd"));
     }
 
     @Override
-    public IO getIO()  throws ProcessBaseException{
-        return new IO(Path.of(this.pathInProcfs.toString(), "io"));
+    public ProcPidIo getIO()  throws ProcessBaseException{
+        return new ProcPidIo(Path.of(this.pathInProcfs.toString(), "io"));
     }
 
     @Override
@@ -153,8 +153,8 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public Stat getStat() throws ProcessBaseException {
-        return new Stat(Path.of(this.pathInProcfs.toString(), "stat"));
+    public ProcPidStat getStat() throws ProcessBaseException {
+        return new ProcPidStat(Path.of(this.pathInProcfs.toString(), "stat"));
     }
 
     @Override

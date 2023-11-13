@@ -1,8 +1,8 @@
 package org.yuzjlab.procfs.process_info;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
-import org.yuzjlab.procfs.files.IO;
-import org.yuzjlab.procfs.files.Stat;
+import org.yuzjlab.procfs.files.ProcPidIo;
+import org.yuzjlab.procfs.files.ProcPidStat;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -70,11 +70,11 @@ public interface ProcessInfoInterface {
 
     long getNumberOfFileDescriptors() throws ProcessBaseException;
 
-    IO getIO() throws ProcessBaseException;
+    ProcPidIo getIO() throws ProcessBaseException;
 
     void getMemoryInformation();
 
-    Stat getStat() throws ProcessBaseException;
+    ProcPidStat getStat() throws ProcessBaseException;
 
     char getState() throws ProcessBaseException;
 }

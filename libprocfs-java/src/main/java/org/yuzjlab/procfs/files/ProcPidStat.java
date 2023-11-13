@@ -29,7 +29,7 @@ import java.util.Scanner;
  * [PT].
  * <p>
  */
-public final class Stat {
+public final class ProcPidStat {
 
     /**
      * The process ID.
@@ -316,7 +316,7 @@ public final class Stat {
      *
      * @param pathToStat Path to the stat file that would be parsed.
      */
-    public Stat(Path pathToStat) throws ProcessBaseException {
+    public ProcPidStat(Path pathToStat) throws ProcessBaseException {
         try (Scanner scn = new Scanner(new FileInputStream(pathToStat.toFile()))) {
             this.pid = scn.nextLong();
             this.comm = scn.next();

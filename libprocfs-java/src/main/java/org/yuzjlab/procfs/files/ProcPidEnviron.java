@@ -31,8 +31,8 @@ import java.util.Map;
  * <p>
  * Permission to access this file is governed by a ptrace access mode <b>PTRACE_MODE_READ_FSCREDS </b>check; see <code>ptrace(2)</code>.
  */
-public final class Environ {
-    private Environ() {
+public final class ProcPidEnviron {
+    private ProcPidEnviron() {
     }
 
     /**

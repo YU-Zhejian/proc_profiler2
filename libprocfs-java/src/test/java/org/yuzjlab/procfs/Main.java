@@ -32,6 +32,10 @@ public class Main {
                 systemProperties.get("java.vendor"),
                 systemProperties.get("java.home")
         );
+
+        var rt = Runtime.getRuntime();
+        lh.info("JVM Memory: Free/Total/Max {}/{}/{}", rt.freeMemory(), rt.totalMemory(), rt.maxMemory());
+
         try{
             ProcessUtils.getProcfsPath();
         }

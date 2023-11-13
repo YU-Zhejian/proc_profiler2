@@ -86,8 +86,8 @@ import java.util.stream.StreamSupport;
  * so <b>cat </b>does not have permission to create a new file descriptor to read from that inode,
  * even though it can still read from its existing file descriptor 0.
  */
-public final class FD {
-    private FD() {
+public final class ProcPidFd {
+    private ProcPidFd() {
     }
 
     /**

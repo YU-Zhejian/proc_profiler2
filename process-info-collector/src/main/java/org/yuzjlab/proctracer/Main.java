@@ -14,6 +14,7 @@ import org.yuzjlab.proctracer.opts.TracerOpts;
 import org.yuzjlab.proctracer.opts.TracerOutFmt;
 import org.yuzjlab.proctracer.psst.BaseProcessSupervisorThread;
 import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadFactory;
+import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadInterface;
 
 class FEOpts {
     public final Options options;
@@ -88,6 +89,42 @@ class FEOpts {
                                 .hasArg(true)
                                 .build()
                 )
+                .addOption(
+                        Option
+                                .builder("o")
+                                .longOpt("outdir")
+                                .desc("Output directory of the tracer.")
+                                .required(true)
+                                .hasArg(true)
+                                .build()
+                )
+                .addOption(
+                        Option
+                                .builder()
+                                .longOpt("frontend-refresh-freq")
+                                .desc("Frequency of refreshing the frontend, in seconds")
+                                .required(false)
+                                .hasArg(true)
+                                .build()
+                )
+                .addOption(
+                        Option
+                                .builder()
+                                .longOpt("backend-refresh-freq")
+                                .desc("Default frequency of refreshing all the backends, in seconds")
+                                .required(false)
+                                .hasArg(true)
+                                .build()
+                )
+                .addOption(
+                        Option
+                                .builder()
+                                .longOpt("supress-frontend")
+                                .desc("Supress the frontend. If set, --frontend-refresh-freq will be defunct.")
+                                .required(false)
+                                .hasArg(false)
+                                .build()
+                )
         ;
     }
 
@@ -112,7 +149,7 @@ class FEOpts {
 
 public class Main {
     public static void main(String[] args) {
-        var lh = LoggerFactory.getLogger(org.yuzjlab.procfs.Main.class.getCanonicalName());
+        var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
         ArrayList<String> argsBeforeCmdLine = new ArrayList<>();
         ArrayList<String> cmdLine = new ArrayList<>();
         boolean hadCmdLine = false;
@@ -139,7 +176,7 @@ public class Main {
                 feopts.printHelp();
                 return;
             }
-            BaseProcessSupervisorThread psst;
+            ProcessSupervisorThreadInterface psst;
             if (!cmd.hasOption("p") && cmdLine.isEmpty()) {
                 throw new ParseException("At least one of the -p [PID] or [CMDS] needs to be specified!");
             }
@@ -195,7 +232,7 @@ public class Main {
             TracerOpts tracerOpts;
             psst.start();
             try{
-                tracerOpts = new TracerOpts(psst.getPid(), new File("") /*TODO*/, topt);
+                tracerOpts = new TracerOpts(psst.getPid(), new File(cmd.getOptionValue("outdir")), topt);
             }
             catch (IOException ioException){
                 lh.error("Failed to validate TracerOptions  Reason: {}", ioException.getMessage());

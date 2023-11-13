@@ -79,7 +79,7 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
               access mode PTRACE_MODE_READ_FSCREDS check; see ptrace(2).
 
  */
-public class IO {
+public class ProcPidIo {
     public final long readChars;
     public final long writeChars;
     public final long readSyscalls;
@@ -88,7 +88,7 @@ public class IO {
     public final long writeBytes;
     public final long cancelledWriteBytes;
 
-    public IO(Path pathOfIO) throws ProcessBaseException {
+    public ProcPidIo(Path pathOfIO) throws ProcessBaseException {
         try(var br = new BufferedReader(new FileReader((pathOfIO.toFile())))) {
             long[] ios = new long[7];
             for (var i = 0; i < ios.length; i++){

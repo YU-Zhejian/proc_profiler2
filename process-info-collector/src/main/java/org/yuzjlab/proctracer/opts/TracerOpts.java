@@ -6,7 +6,12 @@ import org.apache.commons.csv.DuplicateHeaderMode;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.zip.GZIPOutputStream;
 
 public class TracerOpts {
