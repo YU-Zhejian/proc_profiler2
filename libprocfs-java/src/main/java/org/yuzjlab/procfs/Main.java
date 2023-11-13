@@ -9,10 +9,8 @@ import java.util.stream.StreamSupport;
 
 public class Main {
     public static void main(String[] args) throws ProcessBaseException {
-        System.err.println("Running libprocfs-java testing code ...");
         var systemProperties = System.getProperties();
         var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
-
 
         var osName = systemProperties.get("os.name");
         if (!Objects.equals(osName, "Linux")) {
@@ -34,22 +32,58 @@ public class Main {
                 systemProperties.get("java.vendor"),
                 systemProperties.get("java.home")
         );
+        try{
+            ProcessUtils.getProcfsPath();
+        }
+        catch (ProcessBaseException processBaseException){
+            lh.error(processBaseException.getMessage());
+            System.exit(1);
+        }
 
         var p = new EagerEvaluatedProcessInfo(ProcessUtils.getCurrentPid());
-        lh.info("PID: {}", p.getPid());
-        lh.info("CMDLINE: {}", String.join(" ", p.getCmdLine()));
+        lh.info("{} ({}/{})", p.getName(), p.getPid(), p.getState());
+        lh.info("PPID: {}", p.getPPID());
+
+        var cmdLine = String.join(" ", p.getCmdLine());
+        lh.info("CMDLINE: {}", cmdLine);
+
         lh.info("EXEPATH: {}", p.getExePath());
+
+        var children = String.join(
+                " ",
+                StreamSupport
+                        .stream(p.getChildPIDs().spliterator(), false)
+                        .map(String::valueOf)
+                        .toList()
+        );
         lh.info(
                 "CHILDREN ({}): {}",
                 p.getNumChildProcess(),
-                String.join(
-                        " ",
-                        StreamSupport
-                                .stream(p.getChildPIDs().spliterator(), false)
-                                .map(String::valueOf)
-                                .toList()
-                )
+                children
         );
-        System.err.println("Running libprocfs-java testing code FINISHED");
+
+        lh.info("MMAP:");
+        for (var mmapItem :  p.getMemoryMap()){
+            lh.info("\t{}", mmapItem);
+        }
+
+        var io = p.getIO();
+        lh.info(
+                "IO: rchar={}, wchar={}, rsyscall={}, wsyscall={}, rbytes={}, wbytes={}, cwbytes={}",
+                io.readChars, io.writeChars,
+                io.readSyscalls, io.writeSyscalls,
+                io.readBytes, io.writeBytes,
+                io.cancelledWriteBytes
+        );
+
+        lh.info("FD:");
+        var fd = p.getFileDescriptors();
+        for (var fdItem :  fd.entrySet()){
+            lh.info("\t{}: {}", fdItem.getKey(), fdItem.getValue());
+        }
+
+        lh.info("CPU: {}% on {}", Math.round(p.getCPUPercent(5) * 100), p.getOnWhichCPU());
+
+        lh.info("Running libprocfs-java testing code FINISHED");
     }
 }

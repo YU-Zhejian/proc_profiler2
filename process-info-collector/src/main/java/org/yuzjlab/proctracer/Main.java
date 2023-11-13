@@ -1,18 +1,27 @@
 package org.yuzjlab.proctracer;
 
-import org.apache.commons.cli.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+import org.slf4j.LoggerFactory;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 import org.yuzjlab.proctracer.opts.TracerOutFmt;
-
-import java.io.File;
-import java.util.ArrayList;
-
+import org.yuzjlab.proctracer.psst.BaseProcessSupervisorThread;
+import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadFactory;
 
 class FEOpts {
     public final Options options;
+    public static final String DEVNULL = "/dev/null";
 
     FEOpts() {
+        var streamDesc = "File path of the standard %s stream to be redirected to the target process. " +
+                "Only valid if [CMDS] are present. Default to `/dev/null`.";
         this.options = new Options();
         this.options
                 .addOption(
@@ -46,8 +55,7 @@ class FEOpts {
                         Option
                                 .builder()
                                 .longOpt("stdin")
-                                .desc("File path of the standard input to be redirected to the target process. " +
-                                        "Only valid if [CMDS] are present. Default to `/dev/null`.")
+                                .desc(streamDesc.formatted("input"))
                                 .required(false)
                                 .hasArg(true)
                                 .build()
@@ -56,8 +64,7 @@ class FEOpts {
                         Option
                                 .builder()
                                 .longOpt("stdout")
-                                .desc("File path of the standard output to be redirected to the target process. " +
-                                        "Only valid if [CMDS] are present. Default to `/dev/null`.")
+                                .desc(streamDesc.formatted("output"))
                                 .required(false)
                                 .hasArg(true)
                                 .build()
@@ -66,8 +73,17 @@ class FEOpts {
                         Option
                                 .builder()
                                 .longOpt("stderr")
-                                .desc("File path of the standard error to be redirected to the target process. " +
-                                        "Only valid if [CMDS] are present. Default to `/dev/null`.")
+                                .desc(streamDesc.formatted("error"))
+                                .required(false)
+                                .hasArg(true)
+                                .build()
+                )
+                .addOption(
+                        Option
+                                .builder()
+                                .longOpt("wd")
+                                .desc("The working directory for the new process. " +
+                                        "Only valid if [CMDS] are present. Default to current working directory.")
                                 .required(false)
                                 .hasArg(true)
                                 .build()
@@ -95,9 +111,8 @@ class FEOpts {
 }
 
 public class Main {
-    public static void main(String[] args) throws ProcessBaseException {
-        System.err.println("Running libprocfs-java testing code ...");
-
+    public static void main(String[] args) {
+        var lh = LoggerFactory.getLogger(org.yuzjlab.procfs.Main.class.getCanonicalName());
         ArrayList<String> argsBeforeCmdLine = new ArrayList<>();
         ArrayList<String> cmdLine = new ArrayList<>();
         boolean hadCmdLine = false;
@@ -124,15 +139,52 @@ public class Main {
                 feopts.printHelp();
                 return;
             }
+            BaseProcessSupervisorThread psst;
             if (!cmd.hasOption("p") && cmdLine.isEmpty()) {
                 throw new ParseException("At least one of the -p [PID] or [CMDS] needs to be specified!");
             }
-
+            else if (cmd.hasOption("p") &&! cmdLine.isEmpty()) {
+                throw new ParseException("Only one of the -p [PID] or [CMDS] needs to be specified!");
+            }else if(cmd.hasOption("p")){
+                var pidStr = cmd.getOptionValue("p");
+                var pid = -1L;
+                try{
+                    pid = Long.parseLong(pidStr);
+                } catch (NumberFormatException numberFormatException){
+                    throw new ParseException("Specified pid '%s' cannot be parsed!".formatted(pidStr));
+                }
+                psst = ProcessSupervisorThreadFactory.create(pid);
+            } else{
+                var stderr = cmd.getOptionValue("stderr");
+                if (stderr == null){
+                    stderr = FEOpts.DEVNULL;
+                }
+                var stdout = cmd.getOptionValue("stdout");
+                if (stdout == null){
+                    stdout = FEOpts.DEVNULL;
+                }
+                var stdin = cmd.getOptionValue("stdin");
+                if (stdin == null){
+                    stdin = FEOpts.DEVNULL;
+                }
+                var wd = cmd.getOptionValue("wd");
+                if (wd == null){
+                    wd = new File ( "." ).getAbsolutePath();
+                }
+                psst = ProcessSupervisorThreadFactory.create(
+                        cmdLineArr,
+                        new File(stdin),
+                        new File(stdout),
+                        new File(stderr),
+                        new File(wd)
+                );
+            }
             TracerOutFmt topt;
-            if (cmd.hasOption("compress")) {
-                if (cmd.getOptionValue("compress").equals("GZ")) {
+            var compressOptVal = cmd.getOptionValue("compress");
+            if (compressOptVal != null) {
+                if (compressOptVal.equals("GZ")) {
                     topt = TracerOutFmt.GZ;
-                } else if (cmd.getOptionValue("compress").equals("XZ")) {
+                } else if (compressOptVal.equals("XZ")) {
                     topt = TracerOutFmt.XZ;
                 } else {
                     throw new ParseException("--compress should be one of [GZ, XZ] or unspecified,");
@@ -140,10 +192,17 @@ public class Main {
             } else {
                 topt = TracerOutFmt.PLAIN;
             }
+            TracerOpts tracerOpts;
+            psst.start();
+            try{
+                tracerOpts = new TracerOpts(psst.getPid(), new File("") /*TODO*/, topt);
+            }
+            catch (IOException ioException){
+                lh.error("Failed to validate TracerOptions  Reason: {}", ioException.getMessage());
+            }
 
-            var tracerOpts = new TracerOpts(0 /* TODO */, new File("") /*todo*/, topt);
-        } catch (ParseException e) {
-            System.err.println("Parsing failed.  Reason: " + e.getMessage());
+        } catch (ParseException parseException) {
+            lh.error("Parsing failed.  Reason: {}", parseException.getMessage());
             feopts.printHelp();
             System.exit(1);
         }

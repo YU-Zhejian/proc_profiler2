@@ -1,6 +1,6 @@
 package org.yuzjlab.procfs.files;
 
-import org.yuzjlab.procfs.ProcfsInternalUtils;
+import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 import java.io.IOException;
@@ -91,21 +91,6 @@ public final class FD {
     }
 
     /**
-     * Try resolve symbolic link to actual file. If failed, return non-resolved filename.
-     * <p>
-     * This method does <i>not</i> deal with special symbolic links like sockets, pipes, etc.
-     */
-    private static String resolveRealPath(Path path) {
-        String realPath;
-        try {
-            realPath = path.toFile().toPath().toRealPath().toString();
-        } catch (IOException e) {
-            realPath = path.toString();
-        }
-        return realPath;
-    }
-
-    /**
      * Return actual paths to file descriptors of a process.
      *
      * @return A map whose key is file descriptors and values are real paths to that descriptor.
@@ -115,11 +100,11 @@ public final class FD {
         try (var dstream = Files.newDirectoryStream(pathOfFD)) {
             for (var path : dstream) {
                 var descriptor = Integer.parseInt(String.valueOf(path.getFileName()));
-                var realPath = FD.resolveRealPath(path);
+                var realPath = ProcessUtils.resolveRealPath(path);
                 parsedFD.put(descriptor, realPath);
             }
         } catch (IOException e) {
-            throw ProcfsInternalUtils.resolveIOException(e);
+            throw ProcessUtils.resolveIOException(e);
         }
         return parsedFD;
     }
@@ -131,7 +116,7 @@ public final class FD {
         try (var dstream = Files.newDirectoryStream(pathOfFD)) {
             return StreamSupport.stream(dstream.spliterator(), false).count();
         } catch (IOException e) {
-            throw ProcfsInternalUtils.resolveIOException(e);
+            throw ProcessUtils.resolveIOException(e);
         }
     }
 }

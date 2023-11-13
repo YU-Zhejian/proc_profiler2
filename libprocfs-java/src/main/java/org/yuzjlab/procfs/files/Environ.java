@@ -1,6 +1,6 @@
 package org.yuzjlab.procfs.files;
 
-import org.yuzjlab.procfs.ProcfsInternalUtils;
+import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public final class Environ {
             }
             return environMap;
         } catch (IOException e) {
-            throw ProcfsInternalUtils.resolveIOException(e);
+            throw ProcessUtils.resolveIOException(e);
         }
     }
 }

@@ -1,6 +1,7 @@
 package org.yuzjlab.procfs.process_info;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
+import org.yuzjlab.procfs.files.IO;
 import org.yuzjlab.procfs.files.Stat;
 import org.yuzjlab.procfs.helper.Field;
 
@@ -18,7 +19,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     protected Field<Long> numberOfFileDescriptorCache;
     protected Field<Map<String, String>> environmentVariableCache;
 
-    protected CachedProcessInfo(long pid, float expireTime) {
+    protected CachedProcessInfo(long pid, float expireTime) throws ProcessBaseException {
         super(pid);
         this.eepi = new EagerEvaluatedProcessInfo(pid);
         this.expireTime = expireTime;
@@ -69,8 +70,9 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public void getMemoryMap() {
+    public Iterable<String> getMemoryMap() {
         // TODO
+        return null;
     }
 
     @Override
@@ -119,8 +121,9 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public void getIO() {
+    public IO getIO() {
 // TODO
+        return null;
     }
 
     @Override
@@ -141,10 +144,5 @@ public class CachedProcessInfo extends BaseProcessInfo {
     @Override
     public char getState() throws ProcessBaseException {
         return this.getStat().state;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
     }
 }

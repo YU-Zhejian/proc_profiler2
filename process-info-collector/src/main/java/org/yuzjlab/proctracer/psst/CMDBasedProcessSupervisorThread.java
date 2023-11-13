@@ -1,9 +1,13 @@
-package org.yuzjlab.proctracer.opts;
+package org.yuzjlab.proctracer.psst;
 
 import java.io.File;
 import java.io.IOException;
 
-public class ProcessSupervisorThread extends Thread {
+import jnr.posix.POSIX;
+import jnr.posix.POSIXFactory;
+
+
+public class CMDBasedProcessSupervisorThread extends BaseProcessSupervisorThread {
     protected String[] cmds;
     protected Process p;
     File stdin;
@@ -11,7 +15,7 @@ public class ProcessSupervisorThread extends Thread {
     File stderr;
     File wd;
 
-    public ProcessSupervisorThread(String[] cmds, File stdin, File stdout, File stderr, File wd) {
+    public CMDBasedProcessSupervisorThread(String[] cmds, File stdin, File stdout, File stderr, File wd) {
         this.cmds = cmds;
         this.p = null;
         this.stdin = stdin;
@@ -32,7 +36,6 @@ public class ProcessSupervisorThread extends Thread {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
         try {
             this.p.waitFor();
         } catch (InterruptedException e) {
@@ -54,11 +57,5 @@ public class ProcessSupervisorThread extends Thread {
         return this.p.exitValue();
     }
 
-    public void kill() {
-        if (this.p == null) {
-            return;
-        }
-        this.p = this.p.destroyForcibly();
-    }
 
 }

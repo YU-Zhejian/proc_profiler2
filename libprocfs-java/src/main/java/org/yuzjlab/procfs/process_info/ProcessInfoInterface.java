@@ -1,6 +1,7 @@
 package org.yuzjlab.procfs.process_info;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
+import org.yuzjlab.procfs.files.IO;
 import org.yuzjlab.procfs.files.Stat;
 
 import java.nio.file.Path;
@@ -53,7 +54,7 @@ public interface ProcessInfoInterface {
      */
     String getName() throws ProcessBaseException;
 
-    void getMemoryMap();
+    Iterable<String> getMemoryMap() throws ProcessBaseException;
 
     Iterable<Integer> getChildPIDs() throws ProcessBaseException;
 
@@ -69,7 +70,7 @@ public interface ProcessInfoInterface {
 
     long getNumberOfFileDescriptors() throws ProcessBaseException;
 
-    void getIO();
+    IO getIO() throws ProcessBaseException;
 
     void getMemoryInformation();
 

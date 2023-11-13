@@ -21,6 +21,8 @@ dependencies {
     implementation 'org.tukaani:xz:1.9'
     // https://mvnrepository.com/artifact/org.apache.commons/commons-csv
     implementation 'org.apache.commons:commons-csv:1.10.0'
+    // https://mvnrepository.com/artifact/com.github.jnr/jnr-posix
+    implementation 'com.github.jnr:jnr-posix:3.1.18'
 }
 
 application {

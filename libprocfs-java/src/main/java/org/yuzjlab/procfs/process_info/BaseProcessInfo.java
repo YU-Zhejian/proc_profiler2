@@ -1,6 +1,6 @@
 package org.yuzjlab.procfs.process_info;
 
-import org.yuzjlab.procfs.ProcfsInternalUtils;
+import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 import java.io.IOException;
@@ -19,9 +19,9 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
      */
     protected final Path pathInProcfs;
 
-    protected BaseProcessInfo(long pid) {
+    protected BaseProcessInfo(long pid) throws ProcessBaseException {
         this.pid = pid;
-        this.pathInProcfs = Path.of("/", "proc", String.valueOf(pid));
+        this.pathInProcfs = Path.of(ProcessUtils.getProcfsPath(), String.valueOf(pid));
     }
 
     @Override
@@ -41,7 +41,7 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
         try {
             return Path.of(this.pathInProcfs.toString(), name).toRealPath();
         } catch (IOException e) {
-            throw ProcfsInternalUtils.resolveIOException(e);
+            throw ProcessUtils.resolveIOException(e);
         }
     }
 

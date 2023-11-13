@@ -10,7 +10,7 @@ import java.io.*;
 import java.util.zip.GZIPOutputStream;
 
 public class TracerOpts {
-    protected final static CSVFormat yReacerCSVFormat = CSVFormat
+    protected static final CSVFormat yReacerCSVFormat = CSVFormat
             .Builder
             .create()
             .setDelimiter('\t')
@@ -19,19 +19,18 @@ public class TracerOpts {
             .setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW)
             .build();
     protected TracerOutFmt tracerOutFmt;
-    protected int tracePID;
+    protected long tracePID;
     protected File outDirPath;
 
 
-    public TracerOpts(int tracePID, File outDirPath, TracerOutFmt tracerOutFmt) {
+    public TracerOpts(long tracePID, File outDirPath, TracerOutFmt tracerOutFmt) throws IOException {
         this.tracePID = tracePID;
         this.outDirPath = outDirPath;
         this.tracerOutFmt = tracerOutFmt;
         this.outDirPath.mkdirs();
         if (this.outDirPath.exists() && !this.outDirPath.isDirectory()) {
-            // throw new IOException("message");
+            throw new IOException("Failed to mkdir -p '%s'".formatted(this.outDirPath.toString()));
         }
-
     }
 
     public CSVPrinter createCSVPrinter(File name) throws IOException {

@@ -1,6 +1,6 @@
 package org.yuzjlab.procfs.files;
 
-import org.yuzjlab.procfs.ProcfsInternalUtils;
+import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.exception.ProcessFileParsingException;
 
@@ -371,7 +371,7 @@ public final class Stat {
             this.envEnd = scn.nextBigInteger();
             this.exitCode = scn.nextLong();
         } catch (IOException e) {
-            throw ProcfsInternalUtils.resolveIOException(e);
+            throw ProcessUtils.resolveIOException(e);
         } catch (NoSuchElementException e) {
             throw new ProcessFileParsingException(e);
         }
