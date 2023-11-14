@@ -1,5 +1,11 @@
 package org.yuzjlab.proctracer.opts;
 
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.FileBasedConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Parameters;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.DuplicateHeaderMode;
@@ -26,16 +32,37 @@ public class TracerOpts {
     protected TracerOutFmt tracerOutFmt;
     protected long tracePID;
     protected File outDirPath;
+    protected Configuration config;
 
+    public static TracerOpts load(File configPath) throws ConfigurationException{
+        var params = new Parameters();
+        var builder = new FileBasedConfigurationBuilder<FileBasedConfiguration>(PropertiesConfiguration.class)
+                        .configure(params.fileBased().setFile(configPath));
+        return new TracerOpts(builder.getConfiguration());
+    }
 
-    public TracerOpts(long tracePID, File outDirPath, TracerOutFmt tracerOutFmt) throws IOException {
-        this.tracePID = tracePID;
-        this.outDirPath = outDirPath;
-        this.tracerOutFmt = tracerOutFmt;
+    public static  TracerOpts defaults(){
+        return null; // TODO
+    }
+
+    public void validate() throws IOException {
         this.outDirPath.mkdirs();
         if (this.outDirPath.exists() && !this.outDirPath.isDirectory()) {
             throw new IOException("Failed to mkdir -p '%s'".formatted(this.outDirPath.toString()));
         }
+
+    }
+
+    public TracerOpts(Configuration config){
+        this.config = config;
+    }
+
+    public void setTracePID(long tracePID) {
+        this.tracePID = tracePID;
+    }
+
+    public void setOutDirPath(File outDirPath) {
+        this.outDirPath = outDirPath;
     }
 
     public CSVPrinter createCSVPrinter(File name) throws IOException {

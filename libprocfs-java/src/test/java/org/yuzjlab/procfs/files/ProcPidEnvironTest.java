@@ -12,7 +12,7 @@ class ProcPidEnvironTest {
 
     @Test
     void parseEnviron() throws FileNotFoundException, ProcessBaseException {
-        var environPath = new TestHelper().resolveResources("/environ.txt");
+        var environPath = new TestHelper().resolveResources("/proc_pid_environ.txt");
         var parsedEnviron = ProcPidEnviron.parseEnviron(environPath);
         assertEquals(
                 "zh_CN.UTF-8",

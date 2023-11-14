@@ -1,6 +1,8 @@
 package org.yuzjlab.procfs;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
+import org.yuzjlab.procfs.files.ProcMemInfo;
+import org.yuzjlab.procfs.files.ProcStat;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +12,13 @@ import java.util.stream.StreamSupport;
 public final class SystemInfo {
 
     private SystemInfo() {
+    }
+
+    public ProcStat getStat() throws ProcessBaseException{
+        return new ProcStat(Path.of(ProcessUtils.getProcfsPath(), "stat"));
+    }
+    public ProcMemInfo getMemInfo() throws ProcessBaseException{
+        return new ProcMemInfo(Path.of(ProcessUtils.getProcfsPath(), "meminfo"));
     }
 
     public static Iterable<Integer> iterAllPids() throws ProcessBaseException {

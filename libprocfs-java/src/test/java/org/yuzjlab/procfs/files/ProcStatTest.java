@@ -12,25 +12,23 @@ import static org.junit.jupiter.api.Assertions.*;
 class ProcStatTest {
 
     @Test
-    void getTrailingLong() throws FileNotFoundException, ProcessBaseException {
+    void assertRead() throws FileNotFoundException, ProcessBaseException {
         var statPath = new TestHelper().resolveResources("/proc_stat.txt");
         var stat = new ProcStat(statPath);
-        assertEquals(stat.cpuUser, 305556L);
+        assertEquals(stat.cpuUser, 378312L);
         assertEquals(stat.cpuNice, 1431L);
-        assertEquals(stat.cpuSystem, 80662L);
+        assertEquals(stat.cpuSystem, 102527L);
+        assertEquals(stat.cpuIdle, 12358934L);
+        assertEquals(stat.cpuIOWait, 2158L);
+        assertEquals(stat.cpuIrq, 0L);
+        assertEquals(stat.cpuSoftIrq, 8000L);
+        assertEquals(stat.cpuSteal, 0L);
+        assertEquals(stat.cpuGuest, 0L);
+        assertEquals(stat.cpuGuestNice, 0L);
+        assertEquals(stat.ctxt, 59483848L);
+        assertEquals(stat.process, 33812L);
+        assertEquals(stat.procsBlocked, 0L);
+        assertEquals(stat.procsRunning, 1L);
+        assertEquals(stat.btime, 1699882876L);
     }
 }
-/**
- *         this.cpuIdle = scn.nextLong();
- *         this.cpuIOWait = scn.nextLong();
- *         this.cpuIrq = scn.nextLong();
- *         this.cpuSoftIrq = scn.nextLong();
- *         this.cpuSteal = scn.nextLong();
- *         this.cpuGuest = scn.nextLong();
- *         this.cpuGuestNice = scn.nextLong();
- *         this.ctxt = getTrailingLong(lines, "ctxt");
- *         this.process = getTrailingLong(lines, "process");
- *         this.procsBlocked = getTrailingLong(lines, "process_blocked");
- *         this.procsRunning = getTrailingLong(lines, "process_running");
- *         this.btime = getTrailingLong(lines, "btime");
- */
