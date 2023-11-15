@@ -33,8 +33,15 @@ public class ProcessUtils {
     }
 
     public static long getCurrentPid() throws ProcessBaseException {
+    	Path selfProcPath = null;
+    	if (Path.of(getProcfsPath(), "self").toFile().exists()) {
+    		selfProcPath = Path.of(getProcfsPath(), "self");
+    	}
+    	else if (Path.of(getProcfsPath(), "curproc").toFile().exists()) {
+    		selfProcPath = Path.of(getProcfsPath(), "curproc");
+    	}
         try {
-            return Long.parseLong(Path.of(getProcfsPath(), "self").toRealPath().getFileName().toString());
+            return Long.parseLong(selfProcPath.toRealPath().getFileName().toString());
         } catch (NumberFormatException e) {
             throw new ProcessUnknownException(e);
         } catch (IOException e) {

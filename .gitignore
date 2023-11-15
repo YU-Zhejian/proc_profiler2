@@ -721,3 +721,5 @@ cython_debug/
 ## SonarLint
 sonarlint/
 intellij-javadocs-*.xml
+.classpath
+.project
