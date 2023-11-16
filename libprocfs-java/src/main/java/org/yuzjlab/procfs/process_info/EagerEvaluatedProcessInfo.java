@@ -67,7 +67,7 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
     	try {
 			return Files.readString(Path.of(this.pathInProcfs.toString(), "comm")).strip();
 		} catch (IOException e) {
-            throw ProcessUtils.resolveIOException(e);
+			return this.getStat().comm;
         }
     }
 

@@ -319,7 +319,8 @@ public final class ProcPidStat {
     public ProcPidStat(Path pathToStat) throws ProcessBaseException {
         try (Scanner scn = new Scanner(new FileInputStream(pathToStat.toFile()))) {
             this.pid = scn.nextLong();
-            this.comm = scn.next();
+            this.comm = scn.next().replace("(", "").replace(")", "");
+            
             this.state = scn.next().charAt(0);
             this.ppid = scn.nextLong();
             this.pgrp = scn.nextLong();
@@ -359,17 +360,34 @@ public final class ProcPidStat {
             this.processor = scn.nextInt();
             this.rtPriority = scn.nextInt();
             this.policy = scn.nextInt();
-            this.delayacctBlkioTicks = scn.nextLong();
-            this.guestTime = scn.nextLong();
-            this.cguestTime = scn.nextLong();
-            this.startData = scn.nextBigInteger();
-            this.endData = scn.nextBigInteger();
-            this.startBrk = scn.nextBigInteger();
-            this.argStart = scn.nextBigInteger();
-            this.argEnd = scn.nextBigInteger();
-            this.envStart = scn.nextBigInteger();
-            this.envEnd = scn.nextBigInteger();
-            this.exitCode = scn.nextLong();
+            if(scn.hasNextLong()) {
+            	this.delayacctBlkioTicks = scn.nextLong();
+                this.guestTime = scn.nextLong();
+                this.cguestTime = scn.nextLong();
+                this.startData = scn.nextBigInteger();
+                this.endData = scn.nextBigInteger();
+                this.startBrk = scn.nextBigInteger();
+                this.argStart = scn.nextBigInteger();
+                this.argEnd = scn.nextBigInteger();
+                this.envStart = scn.nextBigInteger();
+                this.envEnd = scn.nextBigInteger();
+                this.exitCode = scn.nextLong();
+            }
+            else{
+            	// These things happens in FreeBSD.
+            	this.delayacctBlkioTicks = -1L;
+                this.guestTime = -1L;
+                this.cguestTime = -1L;
+                this.startData = BigInteger.valueOf(-1L);
+                this.endData = BigInteger.valueOf(-1L);
+                this.startBrk = BigInteger.valueOf(-1L);
+                this.argStart = BigInteger.valueOf(-1L);
+                this.argEnd = BigInteger.valueOf(-1L);
+                this.envStart = BigInteger.valueOf(-1L);
+                this.envEnd = BigInteger.valueOf(-1L);
+                this.exitCode = -1L;
+            }
+
         } catch (IOException e) {
             throw ProcessUtils.resolveIOException(e);
         } catch (NoSuchElementException e) {

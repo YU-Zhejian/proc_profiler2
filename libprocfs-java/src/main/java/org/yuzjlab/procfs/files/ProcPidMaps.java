@@ -24,4 +24,8 @@ public class ProcPidMaps {
             throw ProcessUtils.resolveIOException(e);
         }
     }
+    public static Iterable<String> parseMaps(Path pathOfMaps)throws ProcessBaseException{
+        // TODO
+    	return null;
+    }
 }

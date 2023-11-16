@@ -7,8 +7,19 @@ import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
 import java.util.Objects;
 import java.util.stream.StreamSupport;
 
-public class Main {
-    public static void main(String[] args) throws ProcessBaseException {
+
+
+import org.junit.jupiter.api.Test;
+import org.yuzjlab.procfs.exception.ProcessBaseException;
+
+import java.lang.management.ManagementFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class Main {
+
+    @Test
+    void main() throws ProcessBaseException {
         var systemProperties = System.getProperties();
         var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
 
@@ -37,7 +48,7 @@ public class Main {
         lh.info("JVM Memory: Free/Total/Max {}/{}/{}", rt.freeMemory(), rt.totalMemory(), rt.maxMemory());
 
         try{
-            ProcessUtils.getProcfsPath();
+            lh.info("procds identified at {}", ProcessUtils.getProcfsPath());
         }
         catch (ProcessBaseException processBaseException){
             lh.error(processBaseException.getMessage());
