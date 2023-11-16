@@ -1,5 +1,6 @@
 package org.yuzjlab.procfs;
 
+import org.slf4j.LoggerFactory;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.exception.ProcessNotExistException;
 import org.yuzjlab.procfs.exception.ProcessPermissionDeniedException;
@@ -11,25 +12,39 @@ import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 
 @SuppressWarnings("squid:S1075") // Supress URIs should not be hardcoded
 public class ProcessUtils {
     // SonarLint: Suppress
-    protected static final String DEFAULT_PROCFS_PATH = "/proc/";
+    protected static String resolvedProcfsPath = null;
 
     private ProcessUtils() {
 
     }
 
     public static String getProcfsPath () throws ProcessBaseException{
-        var procfsPath = System.getenv("LIBPROCFS_PROCFS_PATH");
-        if (procfsPath == null){
-            procfsPath = DEFAULT_PROCFS_PATH;
+        if (resolvedProcfsPath != null){
+            return resolvedProcfsPath;
         }
-        if (!Files.exists(Path.of(procfsPath))){
-            throw resolveIOException(new FileNotFoundException("PROCFS not exist at '%s'!".formatted(procfsPath)));
+        var procfsPaths = new ArrayList<String>();
+        procfsPaths.add(System.getenv("LIBPROCFS_PROCFS_PATH"));
+        procfsPaths.add("/compat/linux/proc/");
+        procfsPaths.add("/proc/");
+        var lh = LoggerFactory.getLogger(ProcessUtils.class.getCanonicalName());
+        for (var procfsPath: procfsPaths){
+            if (procfsPath == null) {
+                continue;
+            }
+            else if (Files.exists(Path.of(procfsPath))){
+                resolvedProcfsPath = procfsPath;
+                return resolvedProcfsPath;
+            }
+            else{
+                lh.debug("Tried {} failed",procfsPath );
+            }
         }
-        return procfsPath;
+        throw resolveIOException(new FileNotFoundException("PROCFS not exist! See log for tried locations."));
     }
 
     public static long getCurrentPid() throws ProcessBaseException {
