@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
+  <component name="AdditionalModuleElements">
+    <content url="file://$MODULE_DIR$/../../../libprocfs-java" dumb="true">
+      <excludeFolder url="file://$MODULE_DIR$/../../../libprocfs-java/.settings" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../libprocfs-java/bin" />
+    </content>
+  </component>
   <component name="SonarLintModuleSettings">
     <option name="uniqueId" value="911c4d28-699e-4467-ab22-7f4856a6f6c6" />
   </component>

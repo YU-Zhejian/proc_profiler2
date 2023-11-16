@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/proc_profiler2.iml" filepath="$PROJECT_DIR$/.idea/proc_profiler2.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/libprocfs-java/proc_profiler2.libprocfs-java.iml" filepath="$PROJECT_DIR$/.idea/modules/libprocfs-java/proc_profiler2.libprocfs-java.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/process-info-collector/proc_profiler2.process-info-collector.iml" filepath="$PROJECT_DIR$/.idea/modules/process-info-collector/proc_profiler2.process-info-collector.iml" />
+    </modules>
+  </component>
+</project>

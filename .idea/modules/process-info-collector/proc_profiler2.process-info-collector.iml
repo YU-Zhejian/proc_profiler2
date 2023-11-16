@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
+  <component name="AdditionalModuleElements">
+    <content url="file://$MODULE_DIR$/../../../process-info-collector" dumb="true">
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-collector/.settings" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-collector/bin" />
+    </content>
+  </component>
   <component name="SonarLintModuleSettings">
     <option name="uniqueId" value="cd9c798b-8e0a-400b-b84d-a0e299931ad4" />
   </component>
