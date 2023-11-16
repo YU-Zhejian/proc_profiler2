@@ -1,8 +1,8 @@
 import argparse
 import os
-from typing import List
-
 from pid_monitor._dt_mvc.appender import AVAILABLE_TABLE_APPENDERS
+
+from typing import List
 
 DEFAULT_BACKEND_REFRESH_INTERVAL = 0.01
 DEFAULT_FRONTEND_REFRESH_INTERVAL = 1

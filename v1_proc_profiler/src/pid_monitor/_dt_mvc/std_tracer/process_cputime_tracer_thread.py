@@ -1,5 +1,3 @@
-import sys
-
 import psutil
 
 from pid_monitor._dt_mvc import PSUTIL_NOTFOUND_ERRORS

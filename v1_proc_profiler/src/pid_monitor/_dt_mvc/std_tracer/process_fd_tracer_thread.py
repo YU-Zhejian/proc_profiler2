@@ -1,10 +1,9 @@
 import glob
 import os
-from typing import Iterable, Tuple
-
 from pid_monitor._dt_mvc.frontend_cache.process_frontend_cache import ProcessFrontendCache
 from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor._dt_mvc.std_tracer import BaseProcessTracerThread, ProbeError
+from typing import Iterable, Tuple
 
 __all__ = ("ProcessFDTracerThread",)
 

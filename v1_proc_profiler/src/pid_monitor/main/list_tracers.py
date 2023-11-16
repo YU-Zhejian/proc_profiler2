@@ -1,6 +1,5 @@
-from typing import List
-
 from pid_monitor._dt_mvc.std_dispatcher import list_tracer
+from typing import List
 
 
 def main(_: List[str]):

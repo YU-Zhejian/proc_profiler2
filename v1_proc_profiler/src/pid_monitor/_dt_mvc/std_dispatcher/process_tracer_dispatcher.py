@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-import threading
-from time import sleep
-from typing import Optional
-
 import psutil
-
+import threading
 from pid_monitor._dt_mvc import PSUTIL_NOTFOUND_ERRORS
 from pid_monitor._dt_mvc.appender import BaseTableAppender, load_table_appender_class
 from pid_monitor._dt_mvc.appender.typing import TableAppenderConfig
 from pid_monitor._dt_mvc.frontend_cache.process_frontend_cache import ProcessFrontendCache
 from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor._dt_mvc.std_dispatcher import BaseTracerDispatcherThread, DispatcherController
+from time import sleep
+from typing import Optional
 
 _REG_MUTEX = threading.Lock()
 """Mutex for writing registries"""

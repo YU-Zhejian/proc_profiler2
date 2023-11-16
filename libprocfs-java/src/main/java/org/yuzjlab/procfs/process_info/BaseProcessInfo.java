@@ -58,13 +58,11 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
 
         EagerEvaluatedProcessInfo eagerEvaluatedProcessInfo = (EagerEvaluatedProcessInfo) o;
 
-        return pid == eagerEvaluatedProcessInfo.pid;
+        return this.pid == eagerEvaluatedProcessInfo.pid;
     }
 
     @Override
     public String toString() {
-        return "Process{" +
-                "pid=" + pid +
-                '}';
+        return "Process %d".formatted(this.pid);
     }
 }

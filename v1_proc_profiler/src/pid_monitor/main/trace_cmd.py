@@ -4,10 +4,9 @@ import subprocess
 import threading
 import uuid
 from collections import namedtuple
-from typing import List, Any, Mapping, Tuple
-
 from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor.main import trace_pid
+from typing import List, Any, Mapping, Tuple
 
 _MONITORED_PROCESS = namedtuple('DefaultProcess', 'pid')(pid=os.getpid())
 """Process being monitored. If monitor not attached, will be myself."""

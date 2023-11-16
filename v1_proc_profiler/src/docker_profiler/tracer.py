@@ -1,14 +1,13 @@
 from __future__ import annotations
 
+import docker
 import threading
 import time
 from abc import abstractmethod
-from time import sleep
-from typing import Tuple, List, Any, TextIO
-
-import docker
 from docker.errors import APIError, NotFound
 from docker.models.containers import Container
+from time import sleep
+from typing import Tuple, List, Any, TextIO
 
 
 def get_timestamp() -> str:

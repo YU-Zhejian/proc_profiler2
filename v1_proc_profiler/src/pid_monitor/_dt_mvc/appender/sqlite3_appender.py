@@ -1,7 +1,5 @@
-import sqlite3
-
 import pandas as pd
-
+import sqlite3
 from pid_monitor._dt_mvc.appender.typing import PandasDictBufferAppender
 
 

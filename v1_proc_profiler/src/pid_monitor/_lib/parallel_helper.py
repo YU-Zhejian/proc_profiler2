@@ -3,9 +3,8 @@ import gc
 import multiprocessing
 import threading
 import time
-from typing import Union
-
 import tqdm
+from typing import Union
 
 
 class ParallelJobQueue(threading.Thread):

@@ -1,7 +1,7 @@
 import importlib
-from typing import Type, Iterator, Tuple
-
 from pid_monitor._dt_mvc.appender.typing import BaseTableAppender
+
+from typing import Type, Iterator, Tuple
 
 POSSIBLE_APPENDER_PATHS = (
     "pid_monitor._dt_mvc.appender.tsv_appender",

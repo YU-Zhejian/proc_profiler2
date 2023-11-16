@@ -1,8 +1,6 @@
-import os
-
 import fastparquet as fp
+import os
 import pandas as pd
-
 from pid_monitor._dt_mvc.appender.typing import PandasDictBufferAppender
 
 

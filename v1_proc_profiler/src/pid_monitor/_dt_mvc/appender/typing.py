@@ -1,9 +1,9 @@
 import multiprocessing
 import os
-from abc import abstractmethod, ABC
-from typing import List, Any, Dict
-
 import pandas as pd
+from abc import abstractmethod, ABC
+
+from typing import List, Any, Dict
 
 
 class TableAppenderConfig:

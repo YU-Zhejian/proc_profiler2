@@ -6,11 +6,9 @@ import logging
 import os
 import subprocess
 import threading
-from typing import Set
-
-from pid_monitor._private import DEFAULT_SYSTEM_INDICATOR_PID
-
 from pid_monitor._lib import parallel_helper
+from pid_monitor._private import DEFAULT_SYSTEM_INDICATOR_PID
+from typing import Set
 
 _LOG_HANDLER = logging.getLogger()
 """The Logger Handler"""

@@ -2,20 +2,18 @@ from __future__ import annotations
 
 import gc
 import importlib
+import prettytable
 import signal
 import threading
 import time
 from abc import abstractmethod
-from typing import Dict, List, Union, Set, Type, Iterator, Tuple
-
-import prettytable
-
 from pid_monitor._dt_mvc import DEFAULT_SYSTEM_INDICATOR_PID
 from pid_monitor._dt_mvc.frontend_cache.process_frontend_cache import ProcessFrontendCache
 from pid_monitor._dt_mvc.frontend_cache.system_frontend_cache import SystemFrontendCache
 from pid_monitor._dt_mvc.pm_config import PMConfig, POSSIBLE_TRACER_PATHS
 from pid_monitor._dt_mvc.std_tracer import BaseTracerThread
 from pid_monitor._dt_mvc.typing import ThreadWithPMC
+from typing import Dict, List, Union, Set, Type, Iterator, Tuple
 
 _PROCESS_TABLE_COL_NAMES = (
     'PID',

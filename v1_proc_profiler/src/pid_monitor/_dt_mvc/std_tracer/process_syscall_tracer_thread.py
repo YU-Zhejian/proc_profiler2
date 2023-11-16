@@ -2,9 +2,8 @@ import lzma
 import re
 import shutil
 import subprocess
-from typing import TextIO, Tuple
-
 from pid_monitor._dt_mvc.std_tracer import BaseProcessTracerThread
+from typing import TextIO, Tuple
 
 PLINE_ERR_REGEX = re.compile(r"^ = -1 (.+) \(.+\)$")
 PLINE_SIGNAL_REGEX = re.compile(r"--- (.+?) .*")

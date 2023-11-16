@@ -1,9 +1,8 @@
 import subprocess
 from logging import getLogger
-from time import sleep
-
 from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor._dt_mvc.std_dispatcher import DispatcherController
+from time import sleep
 
 _LOGGER_HANDLER = getLogger(__name__)
 

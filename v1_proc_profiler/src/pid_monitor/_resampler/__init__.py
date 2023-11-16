@@ -5,18 +5,15 @@ WARNING! This file is subject to change.
 import glob
 import logging
 import math
+import matplotlib.pyplot as plt
 import multiprocessing
 import os
+import pandas as pd
 import queue
 import re
-from typing import Tuple, Optional, List, Dict
-
-import matplotlib.pyplot as plt
-import pandas as pd
 import tqdm
-import seaborn as sns
-
 from pid_monitor._lib import parallel_helper
+from typing import Tuple, Optional, List, Dict
 
 
 def get_first_and_last_timestamp_from_a_file(path: str) -> Optional[Tuple[float, float]]:

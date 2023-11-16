@@ -1,7 +1,7 @@
-from typing import List, Any
-
 from pid_monitor._dt_mvc.appender import BaseTableAppender
 from pid_monitor._dt_mvc.appender.typing import TableAppenderConfig
+
+from typing import List, Any
 
 
 class DumbTableAppender(BaseTableAppender):

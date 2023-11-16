@@ -1,9 +1,12 @@
-package org.yuzjlab.procfs.process_info;
+package org.yuzjlab.procfs.deprecated.process_info;
 
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcPidIo;
 import org.yuzjlab.procfs.files.ProcPidStat;
-import org.yuzjlab.procfs.helper.Field;
+import org.yuzjlab.procfs.files.ProcPidStatm;
+import org.yuzjlab.procfs.deprecated.helper.Field;
+import org.yuzjlab.procfs.process_info.BaseProcessInfo;
+import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
 
 import java.nio.file.Path;
 import java.util.Map;
@@ -18,6 +21,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     protected Field<Map<Integer, String>> fileDescriptorsCache;
     protected Field<Long> numberOfFileDescriptorCache;
     protected Field<Map<String, String>> environmentVariableCache;
+    protected Long ppidCache;
 
     protected CachedProcessInfo(long pid, float expireTime) throws ProcessBaseException {
         super(pid);
@@ -61,7 +65,10 @@ public class CachedProcessInfo extends BaseProcessInfo {
 
     @Override
     public long getPPID() throws ProcessBaseException {
-        return 0;// TODO
+        if(this.ppidCache == null){
+            this.ppidCache = this.eepi.getPPID();
+        }
+        return this.ppidCache;
     }
 
     @Override
@@ -76,8 +83,9 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public Iterable<Integer> getChildPIDs() {
-        return null;// TODO
+    public Iterable<Integer> getChildPIDs() throws ProcessBaseException {
+        // No cache for this method
+        return this.eepi.getChildPIDs();
     }
 
     @Override
@@ -127,8 +135,9 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public void getMemoryInformation() {
+    public ProcPidStatm getMemoryInformation() {
 // TODO
+        return null;
     }
 
     @Override

@@ -3,8 +3,6 @@ import logging
 import os
 import signal
 import sys
-from typing import List
-
 from pid_monitor._dt_mvc import PSUTIL_NOTFOUND_ERRORS
 from pid_monitor._dt_mvc.appender import load_table_appender_class, BaseTableAppender
 from pid_monitor._dt_mvc.appender.typing import TableAppenderConfig
@@ -13,6 +11,7 @@ from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor._dt_mvc.std_dispatcher import DispatcherController
 from pid_monitor._dt_mvc.std_dispatcher.process_tracer_dispatcher import ProcessTracerDispatcherThread
 from pid_monitor._dt_mvc.std_dispatcher.system_tracer_dispatcher import SystemTracerDispatcherThread
+from typing import List
 
 _LOG_HANDLER = logging.getLogger()
 

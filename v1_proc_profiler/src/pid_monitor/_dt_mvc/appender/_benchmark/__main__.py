@@ -3,12 +3,10 @@ import os
 import random
 import string
 import time
-from typing import Iterable
-
 import tqdm
-
 from pid_monitor._dt_mvc.appender import load_table_appender_class, BaseTableAppender
 from pid_monitor._dt_mvc.appender.typing import TableAppenderConfig
+from typing import Iterable
 
 
 def bench_multithread(

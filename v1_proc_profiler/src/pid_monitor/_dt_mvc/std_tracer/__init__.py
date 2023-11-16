@@ -7,12 +7,8 @@ which only depends on psutil or UNIX ProcFS.
 Other tracers that may depend on third-party libraries or software is located in other files
 under :py:mod:`additional_tracer`.
 """
-from abc import abstractmethod, ABC
-from time import sleep
-from typing import Union, Optional, List
-
 import psutil
-
+from abc import abstractmethod, ABC
 from pid_monitor._dt_mvc import DEFAULT_SYSTEM_INDICATOR_PID, PSUTIL_NOTFOUND_ERRORS
 from pid_monitor._dt_mvc.appender import BaseTableAppender, load_table_appender_class
 from pid_monitor._dt_mvc.appender.typing import TableAppenderConfig
@@ -20,6 +16,8 @@ from pid_monitor._dt_mvc.frontend_cache.process_frontend_cache import ProcessFro
 from pid_monitor._dt_mvc.frontend_cache.system_frontend_cache import SystemFrontendCache
 from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor._dt_mvc.typing import ThreadWithPMC
+from time import sleep
+from typing import Union, Optional, List
 
 
 class ProbeError(ValueError):

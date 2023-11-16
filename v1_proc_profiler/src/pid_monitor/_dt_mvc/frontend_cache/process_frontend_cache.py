@@ -1,6 +1,5 @@
-from typing import List
-
 from pid_monitor._dt_mvc.frontend_cache import percent_to_str, to_human_readable
+from typing import List
 
 
 class ProcessFrontendCache:

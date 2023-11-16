@@ -2,15 +2,14 @@
 TODO
 """
 
+import docker
 import os
 import signal
 import sys
 import uuid
-from typing import List, Optional
-
-import docker
 from docker.errors import APIError, NotFound
 from docker.models.containers import Container
+from typing import List, Optional
 
 __version__ = 0.1
 

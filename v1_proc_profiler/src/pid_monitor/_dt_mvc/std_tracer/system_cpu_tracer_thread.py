@@ -1,15 +1,13 @@
+import psutil
 import threading
 import time
-from statistics import mean
-from typing import List
-
-import psutil
-
 from pid_monitor._dt_mvc.appender import BaseTableAppender
 from pid_monitor._dt_mvc.frontend_cache.process_frontend_cache import ProcessFrontendCache
 from pid_monitor._dt_mvc.frontend_cache.system_frontend_cache import SystemFrontendCache
 from pid_monitor._dt_mvc.pm_config import PMConfig
 from pid_monitor._dt_mvc.std_tracer import BaseSystemTracerThread
+from statistics import mean
+from typing import List
 
 __all__ = ("SystemCPUTracerThread",)
 

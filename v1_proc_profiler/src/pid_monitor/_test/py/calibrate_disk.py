@@ -1,5 +1,5 @@
-import os
 import gc
+import os
 import time
 
 gb_bytes = bytearray(1024*1024*1024)

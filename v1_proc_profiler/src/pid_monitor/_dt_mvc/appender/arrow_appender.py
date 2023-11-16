@@ -4,12 +4,11 @@ Using arrow IPC format with one record per block.
 This application have bugs.
 """
 
-from typing import List, Optional
-
 import pandas as pd
 import pyarrow as pa
-
 from pid_monitor._dt_mvc.appender.typing import TableAppenderConfig, DictBufferAppender
+
+from typing import List, Optional
 
 
 class ArrowTableAppender(DictBufferAppender):

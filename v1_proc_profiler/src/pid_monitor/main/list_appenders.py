@@ -1,6 +1,5 @@
-from typing import List
-
 from pid_monitor._dt_mvc.appender import list_table_appender
+from typing import List
 
 
 def main(_: List[str]):
