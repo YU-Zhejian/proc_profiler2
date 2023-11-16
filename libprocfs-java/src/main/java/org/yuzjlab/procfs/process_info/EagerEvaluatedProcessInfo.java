@@ -64,9 +64,9 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
 
     @Override
     public String getName() throws ProcessBaseException {
-        try {
-            return Files.readString(Path.of(this.pathInProcfs.toString(), "comm")).strip();
-        } catch (IOException e) {
+    	try {
+			return Files.readString(Path.of(this.pathInProcfs.toString(), "comm")).strip();
+		} catch (IOException e) {
             throw ProcessUtils.resolveIOException(e);
         }
     }
@@ -154,7 +154,7 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo {
 
     @Override
     public ProcPidStat getStat() throws ProcessBaseException {
-        return new ProcPidStat(Path.of(this.pathInProcfs.toString(), "stat"));
+    	return new ProcPidStat(Path.of(this.pathInProcfs.toString(), "stat"));
     }
 
     @Override
