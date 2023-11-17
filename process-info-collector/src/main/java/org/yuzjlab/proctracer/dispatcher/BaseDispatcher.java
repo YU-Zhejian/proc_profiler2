@@ -9,7 +9,7 @@ public abstract class BaseDispatcher extends Thread implements DispatcherInterfa
 
   private BaseDispatcher() {}
 
-  public BaseDispatcher(Configuration allConfig) {
+  protected BaseDispatcher(Configuration allConfig) {
     var probableConfig = allConfig.subset(this.getClass().getCanonicalName());
     if (probableConfig == null || probableConfig.isEmpty()) {
       this.config = this.getDefaultConfig();
@@ -23,10 +23,13 @@ public abstract class BaseDispatcher extends Thread implements DispatcherInterfa
   }
 
   protected abstract void probe();
+  protected void setUp(){}
+  protected void tearDown(){  }
 
   protected abstract Map<String, String> frontendFetch();
 
   public void run() {
+    setUp();
     var sleepTime = (int) (this.config.getFloat("interval") * 1000);
     while (!this.shouldStop) {
       this.probe();
@@ -38,5 +41,6 @@ public abstract class BaseDispatcher extends Thread implements DispatcherInterfa
         Thread.currentThread().interrupt();
       }
     }
+    tearDown();
   }
 }

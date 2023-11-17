@@ -1,26 +1,47 @@
 package org.yuzjlab.proctracer;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.yuzjlab.proctracer.dispatcher.MainDispatcher;
 import org.yuzjlab.proctracer.opts.TracerOpts;
-import org.yuzjlab.proctracer.opts.TracerOutFmt;
 import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadFactory;
 import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadInterface;
 
 class FEOpts {
-  public static final String DEVNULL = "/dev/null";
   public static final Option helpOption =
       Option.builder("h")
           .longOpt("help")
           .desc("Display this help")
+          .required(false)
+          .hasArg(false)
+          .build();
+  public static final Option writeDefaultConfigOption =
+      Option.builder("")
+          .longOpt("write-default-config")
+          .desc(
+              "Write default config and exit."
+                  + "If --config is specified, will write to that file."
+                  + "Otherwise, will write to standard output.")
           .required(false)
           .hasArg(false)
           .build();
@@ -31,9 +52,9 @@ class FEOpts {
           .required(false)
           .hasArg(true)
           .build();
-  public static final Option compressOption =
+  public static final Option compressFmtOption =
       Option.builder()
-          .longOpt("compress")
+          .longOpt("compress-fmt")
           .desc("Whether to compress the output streams, default to false. Valid choices: [GZ, XZ]")
           .required(false)
           .hasArg(true)
@@ -51,7 +72,7 @@ class FEOpts {
       Option.builder("o")
           .longOpt("outdir")
           .desc("Output directory of the tracer.")
-          .required(true)
+          .required(false)
           .hasArg(true)
           .build();
   public static final Option frontendRefreshFreqOption =
@@ -68,7 +89,7 @@ class FEOpts {
           .required(false)
           .hasArg(true)
           .build();
-  public static final Option supressFrontendOption =
+  public static final Option suppressFrontendOption =
       Option.builder()
           .longOpt("suppress-frontend")
           .desc("Suppress the frontend. If set, --frontend-refresh-freq will be defunct.")
@@ -82,43 +103,55 @@ class FEOpts {
           .required(false)
           .hasArg(true)
           .build();
-  protected static final String streamDesc =
+  public static final Option envOption =
+      Option.builder()
+          .longOpt("env")
+          .desc(
+              "Path to a environment file where environment name and value separated using '='. "
+                  + "Only valid if [CMDS] are present. "
+                  + "Default to current environment.")
+          .required(false)
+          .hasArg(true)
+          .build();
+  protected static final String STREAM_DESC =
       "File path of the standard %s stream to be redirected to the target process. "
           + "Only valid if [CMDS] are present. Default to `/dev/null`.";
   public static final Option stdinOption =
       Option.builder()
           .longOpt("stdin")
-          .desc(streamDesc.formatted("input"))
+          .desc(STREAM_DESC.formatted("input"))
           .required(false)
           .hasArg(true)
           .build();
   public static final Option stdoutOption =
       Option.builder()
           .longOpt("stdout")
-          .desc(streamDesc.formatted("output"))
+          .desc(STREAM_DESC.formatted("output"))
           .required(false)
           .hasArg(true)
           .build();
   public static final Option stderrOption =
       Option.builder()
           .longOpt("stderr")
-          .desc(streamDesc.formatted("error"))
+          .desc(STREAM_DESC.formatted("error"))
           .required(false)
           .hasArg(true)
           .build();
   public static final Options options =
       new Options()
           .addOption(helpOption)
+          .addOption(writeDefaultConfigOption)
           .addOption(pidOption)
-          .addOption(compressOption)
+          .addOption(compressFmtOption)
           .addOption(stdinOption)
           .addOption(stdoutOption)
           .addOption(stderrOption)
+          .addOption(envOption)
           .addOption(wdOption)
           .addOption(outdirOption)
           .addOption(frontendRefreshFreqOption)
           .addOption(backendRefreshFreqOption)
-          .addOption(supressFrontendOption)
+          .addOption(suppressFrontendOption)
           .addOption(configOption);
 
   FEOpts() {}
@@ -143,6 +176,23 @@ class FEOpts {
 
 public class Main {
 
+  private static Map<String, String> parseEnv(File envPath) throws IOException {
+    var envMap = new HashMap<String, String>();
+    var lineNo = 0;
+    for (var environKeyValue : Files.readAllLines(envPath.toPath())) {
+      var sepIdx = environKeyValue.indexOf('=');
+      if (sepIdx == -1) {
+        throw new IOException(
+            "Line %d of File %s should have at least one '='".formatted(lineNo, envPath.toString()));
+      }
+      var envKey = environKeyValue.substring(0, sepIdx);
+      var envValue = environKeyValue.substring(sepIdx + 1);
+      envMap.put(envKey, envValue);
+      lineNo += 1;
+    }
+    return envMap;
+  }
+
   private static Pair<String[], String[]> splitArgsBeforeAfterCmd(String[] args) {
     ArrayList<String> argsBeforeCmdLine = new ArrayList<>();
     ArrayList<String> cmdLine = new ArrayList<>();
@@ -164,95 +214,167 @@ public class Main {
     return Pair.of(argsBeforeCmdLineArr, cmdLineArr);
   }
 
+  @SuppressWarnings("java:S106") // I need to write something to stdout
+  private static void writeDefaultConfig(CommandLine cmd, Logger lh){
+    String outPath = "null";
+    try {
+      var pconfig = new PropertiesConfiguration();
+      pconfig.copy(TracerOpts.getDefaultConfig());
+      Writer defConfOutWriter;
+      if (cmd.hasOption(FEOpts.configOption)) {
+        outPath = cmd.getOptionValue(FEOpts.configOption);
+        defConfOutWriter = new FileWriter(outPath);
+      } else{
+        outPath = "stdout";
+        defConfOutWriter = new OutputStreamWriter(System.out);
+      }
+      pconfig.write(defConfOutWriter);
+    }
+    catch (IOException ioException){
+      lh.error("IOException detected: %s".formatted(ioException.getMessage()));
+      lh.error("Failed to write default configuration to '%s'!".formatted(outPath));
+      lh.error("Suggested: Examine whether the directory containing destination file exists or whether you have enough permission.");
+      System.exit(1);
+    }
+    catch (ConfigurationException e) {
+      lh.error("ConfigurationException detected: %s".formatted(e.getMessage()));
+      lh.error("This may be due to an internal error. Please send an e-mail to us.");
+      System.exit(1);
+    }
+    System.exit(0);
+  }
+
+  private static ProcessSupervisorThreadInterface createPSST (
+    CommandLine cmd, Logger lh, String[] cmdLineArr
+  ){
+    ProcessSupervisorThreadInterface psst = null;
+    if (!cmd.hasOption(FEOpts.pidOption) && cmdLineArr.length == 0) {
+      lh.error("At least one of the -p [PID] or [CMDS] needs to be specified!");
+      System.exit(1);
+    } else if (cmd.hasOption(FEOpts.pidOption) && cmdLineArr.length != 0) {
+      lh.error("Only one of the -p [PID] or [CMDS] needs to be specified!");
+      System.exit(1);
+    } else if (cmd.hasOption(FEOpts.pidOption)) {
+      var pidStr = cmd.getOptionValue(FEOpts.pidOption);
+      var pid = -1L;
+
+      try {
+        pid = Long.parseLong(pidStr);
+      } catch (NumberFormatException numberFormatException) {
+        lh.error("Specified pid '{}' cannot be parsed!", pidStr);
+        System.exit(1);
+      }
+      lh.info("Creating PSST from PID {}", pid);
+      psst= ProcessSupervisorThreadFactory.create(pid);
+    } else {
+      var stderrOptVal = cmd.getOptionValue(FEOpts.stderrOption);
+      if (stderrOptVal == null) {
+        lh.info("--stderr not set; default to {}", TracerOpts.DEVNULL);
+        stderrOptVal = TracerOpts.DEVNULL;
+      }
+
+      var stdoutOptVal = cmd.getOptionValue(FEOpts.stdoutOption);
+      if (stdoutOptVal == null) {
+        lh.info("--stdout not set; default to {}", TracerOpts.DEVNULL);
+        stdoutOptVal = TracerOpts.DEVNULL;
+      }
+
+      var stdinOptVal = cmd.getOptionValue(FEOpts.stdinOption);
+      if (stdinOptVal == null) {
+        lh.info("--stdin not set; default to {}", TracerOpts.DEVNULL);
+        stdinOptVal = TracerOpts.DEVNULL;
+      }
+
+      var wdOptVal = cmd.getOptionValue(FEOpts.wdOption);
+      if (wdOptVal == null) {
+        wdOptVal = new File(".").getAbsolutePath();
+        lh.info("--wd not set; default to {}", wdOptVal);
+      }
+
+      Map<String, String> env = null;
+      var envOptVal = cmd.getOptionValue(FEOpts.envOption);
+      if (envOptVal != null) {
+        try {
+          env = parseEnv(new File(envOptVal));
+        } catch (IOException e) {
+          lh.error("--env file parse failed.");
+          System.exit(1);
+        }
+      } else {
+        env = System.getenv();
+        lh.info("--env not set; default current environment");
+      }
+
+      psst=
+        ProcessSupervisorThreadFactory.create(
+          cmdLineArr, new File(stdinOptVal), new File(stdoutOptVal), new File(stderrOptVal), new File(wdOptVal), env);
+    }
+    return psst;
+  }
+
   public static Pair<ProcessSupervisorThreadInterface, TracerOpts> parseArgs(
       String[] argsBeforeCmdLineArr, String[] cmdLineArr) throws ParseException {
     var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
     var parser = new DefaultParser();
     var cmd = parser.parse(FEOpts.options, argsBeforeCmdLineArr);
-    ProcessSupervisorThreadInterface psst;
-    TracerOutFmt topt;
-    TracerOpts tracerOpts = null;
 
     if (cmd.hasOption(FEOpts.helpOption)) {
       FEOpts.printHelp();
       System.exit(0);
     }
 
-    if (cmd.hasOption(FEOpts.configOption)) {
-      try {
-        tracerOpts = TracerOpts.load(new File(cmd.getOptionValue(FEOpts.configOption)));
-      } catch (ConfigurationException e) {
-        lh.error("Failed to parse provided config. Error: {}", e.getMessage());
-        System.exit(1);
-      }
-    } else {
-      tracerOpts = TracerOpts.defaults();
+    if (cmd.hasOption(FEOpts.writeDefaultConfigOption)) {
+      writeDefaultConfig(cmd, lh);
     }
 
-    if (!cmd.hasOption(FEOpts.pidOption) && cmdLineArr.length == 0) {
-      throw new ParseException("At least one of the -p [PID] or [CMDS] needs to be specified!");
-    } else if (cmd.hasOption(FEOpts.pidOption) && cmdLineArr.length != 0) {
-      throw new ParseException("Only one of the -p [PID] or [CMDS] needs to be specified!");
-    } else if (cmd.hasOption(FEOpts.pidOption)) {
-      var pidStr = cmd.getOptionValue(FEOpts.pidOption);
-      var pid = -1L;
-      try {
-        pid = Long.parseLong(pidStr);
-      } catch (NumberFormatException numberFormatException) {
-        throw new ParseException("Specified pid '%s' cannot be parsed!".formatted(pidStr));
-      }
-      psst = ProcessSupervisorThreadFactory.create(pid);
-    } else {
-      var stderr = cmd.getOptionValue(FEOpts.stderrOption);
-      if (stderr == null) {
-        stderr = FEOpts.DEVNULL;
-      }
-      var stdout = cmd.getOptionValue(FEOpts.stdoutOption);
-      if (stdout == null) {
-        stdout = FEOpts.DEVNULL;
-      }
-      var stdin = cmd.getOptionValue(FEOpts.stdinOption);
-      if (stdin == null) {
-        stdin = FEOpts.DEVNULL;
-      }
-      var wd = cmd.getOptionValue(FEOpts.wdOption);
-      if (wd == null) {
-        wd = new File(".").getAbsolutePath();
-      }
-      psst =
-          ProcessSupervisorThreadFactory.create(
-              cmdLineArr, new File(stdin), new File(stdout), new File(stderr), new File(wd));
-    }
-
-    var compressOptVal = cmd.getOptionValue(FEOpts.compressOption);
-    if (compressOptVal != null) {
-      if (compressOptVal.equals("GZ")) {
-        topt = TracerOutFmt.GZ;
-      } else if (compressOptVal.equals("XZ")) {
-        topt = TracerOutFmt.XZ;
+    TracerOpts tracerOpts;
+    String configPath = "null";
+    try {
+      if (cmd.hasOption(FEOpts.configOption)) {
+        configPath = cmd.getOptionValue(FEOpts.configOption);
+        tracerOpts = TracerOpts.load(new File(configPath));
       } else {
-        throw new ParseException("--compress should be one of [GZ, XZ] or unspecified,");
+        configPath = "defaults";
+        tracerOpts = TracerOpts.defaults();
       }
-    } else {
-      topt = TracerOutFmt.PLAIN;
+    } catch (ConfigurationException | IOException e) {
+      throw new ParseException(
+        "Failed to parse default configuration from %s!".formatted(configPath)
+      );
     }
 
-    tracerOpts.setOutDirPath(new File(cmd.getOptionValue(FEOpts.outdirOption)));
+    ProcessSupervisorThreadInterface psst = createPSST(cmd, lh, cmdLineArr);
+
+    try {
+      tracerOpts.setCompressFmt(cmd.getOptionValue(FEOpts.compressFmtOption));
+    } catch (ConfigurationException e) {
+      throw new ParseException("--compress should be one of [GZ, XZ] or unspecified.");
+    }
+
+    var outDirOptVal = cmd.getOptionValue(FEOpts.outdirOption);
+    if (outDirOptVal == null){
+      throw new ParseException("--out-dir should be specified.");
+    }
+    tracerOpts.setOutDirPath(new File(outDirOptVal));
     return Pair.of(psst, tracerOpts);
   }
 
   public static void main(String[] args) {
+    Locale.setDefault(new Locale("en","US"));
     var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
     var argPair = splitArgsBeforeAfterCmd(args);
+    ProcessSupervisorThreadInterface psst = null;
+    TracerOpts topt = null;
     try {
       var psstToptPair = parseArgs(argPair.getLeft(), argPair.getRight());
+      psst = psstToptPair.getLeft();
+      topt = psstToptPair.getRight();
     } catch (ParseException parseException) {
       lh.error("Parsing failed.  Reason: {}", parseException.getMessage());
       FEOpts.printHelp();
       System.exit(1);
     }
-    //
-    //        psst.start();
-    //        tracerOpts.setTracePID(psst.getPid());
+    var mainDispatcher = new MainDispatcher(topt, psst);
+    mainDispatcher.start();
   }
 }

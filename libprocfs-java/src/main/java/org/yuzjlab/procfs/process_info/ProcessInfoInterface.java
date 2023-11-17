@@ -24,8 +24,8 @@ public interface ProcessInfoInterface {
 
   /**
    * Get Process ID (PID)
-   *
-   * @apiNote
+   * <p>
+   * <b>NOTE</b> PID should not be considered as the unique identifier for a process.
    */
   long getPid();
 

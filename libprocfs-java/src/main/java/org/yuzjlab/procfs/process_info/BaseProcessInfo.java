@@ -13,6 +13,10 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
      * pid -- Process ID
      */
     protected final long pid;
+    /**
+     * Start time in clock ticks.
+     */
+    protected final long startTime;
 
     /**
      * A String of path in procfs. For example, <code>/proc/1</code>
@@ -22,6 +26,7 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
     protected BaseProcessInfo(long pid) throws ProcessBaseException {
         this.pid = pid;
         this.pathInProcfs = Path.of(ProcessUtils.getProcfsPath(), String.valueOf(pid));
+        this.startTime = this.getStat().starttime;
     }
 
     @Override
@@ -45,10 +50,9 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
         }
     }
 
-
     @Override
     public int hashCode() {
-        return Objects.hash(pid);
+        return Objects.hash(this.pid, this.startTime);
     }
 
     @Override
@@ -58,7 +62,8 @@ public abstract class BaseProcessInfo implements ProcessInfoInterface {
 
         EagerEvaluatedProcessInfo eagerEvaluatedProcessInfo = (EagerEvaluatedProcessInfo) o;
 
-        return this.pid == eagerEvaluatedProcessInfo.pid;
+        return (this.pid == eagerEvaluatedProcessInfo.pid) &&
+          (this.startTime == eagerEvaluatedProcessInfo.startTime);
     }
 
     @Override

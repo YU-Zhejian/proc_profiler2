@@ -27,6 +27,9 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.12.0'
     // https://mvnrepository.com/artifact/com.github.jnr/jnr-posix
     implementation 'com.github.jnr:jnr-posix:3.1.18'
+    // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
+    runtimeOnly 'commons-beanutils:commons-beanutils:1.9.4'
+
 }
 
 application {
