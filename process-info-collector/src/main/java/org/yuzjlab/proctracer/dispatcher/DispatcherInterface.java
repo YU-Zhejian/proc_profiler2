@@ -1,9 +1,12 @@
 package org.yuzjlab.proctracer.dispatcher;
 
 import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.yuzjlab.proctracer.utils.ThreadInterface;
+import org.apache.commons.configuration2.MapConfiguration;
 
-public interface DispatcherInterface extends ThreadInterface {
-  Configuration getDefaultConfig() throws ConfigurationException;
+import java.util.HashMap;
+
+public interface DispatcherInterface extends Runnable {
+    static Configuration getDefaultConfig() {
+        return new MapConfiguration(new HashMap<>());
+    }
 }

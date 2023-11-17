@@ -1,15 +1,14 @@
 package org.yuzjlab.procfs.deprecated.process_info;
 
+import java.nio.file.Path;
+import java.util.Map;
+import org.yuzjlab.procfs.deprecated.helper.Field;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcPidIo;
 import org.yuzjlab.procfs.files.ProcPidStat;
 import org.yuzjlab.procfs.files.ProcPidStatm;
-import org.yuzjlab.procfs.deprecated.helper.Field;
 import org.yuzjlab.procfs.process_info.BaseProcessInfo;
 import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
-
-import java.nio.file.Path;
-import java.util.Map;
 
 public class CachedProcessInfo extends BaseProcessInfo {
     protected final EagerEvaluatedProcessInfo eepi;
@@ -56,16 +55,15 @@ public class CachedProcessInfo extends BaseProcessInfo {
     @Override
     public Map<String, String> getEnvironmentVariables() throws ProcessBaseException {
         if (this.environmentVariableCache == null) {
-            this.environmentVariableCache = new Field<>(
-                    this.eepi::getEnvironmentVariables, this.expireTime
-            );
+            this.environmentVariableCache =
+                    new Field<>(this.eepi::getEnvironmentVariables, this.expireTime);
         }
         return this.environmentVariableCache.get();
     }
 
     @Override
     public long getPPID() throws ProcessBaseException {
-        if(this.ppidCache == null){
+        if (this.ppidCache == null) {
             this.ppidCache = this.eepi.getPPID();
         }
         return this.ppidCache;
@@ -105,15 +103,13 @@ public class CachedProcessInfo extends BaseProcessInfo {
 
     @Override
     public float getCPUPercent(float waitNSeconds) {
-        return 0;// TODO
+        return 0; // TODO
     }
 
     @Override
     public Map<Integer, String> getFileDescriptors() throws ProcessBaseException {
         if (this.fileDescriptorsCache == null) {
-            this.fileDescriptorsCache = new Field<>(
-                    this.eepi::getFileDescriptors, this.expireTime
-            );
+            this.fileDescriptorsCache = new Field<>(this.eepi::getFileDescriptors, this.expireTime);
         }
         return this.fileDescriptorsCache.get();
     }
@@ -121,31 +117,28 @@ public class CachedProcessInfo extends BaseProcessInfo {
     @Override
     public long getNumberOfFileDescriptors() throws ProcessBaseException {
         if (this.numberOfFileDescriptorCache == null) {
-            this.numberOfFileDescriptorCache = new Field<>(
-                    this.eepi::getNumberOfFileDescriptors, this.expireTime
-            );
+            this.numberOfFileDescriptorCache =
+                    new Field<>(this.eepi::getNumberOfFileDescriptors, this.expireTime);
         }
         return this.numberOfFileDescriptorCache.get();
     }
 
     @Override
     public ProcPidIo getIO() {
-// TODO
+        // TODO
         return null;
     }
 
     @Override
     public ProcPidStatm getMemoryInformation() {
-// TODO
+        // TODO
         return null;
     }
 
     @Override
     public ProcPidStat getStat() throws ProcessBaseException {
         if (this.statCache == null) {
-            this.statCache = new Field<>(
-                    this.eepi::getStat, this.expireTime
-            );
+            this.statCache = new Field<>(this.eepi::getStat, this.expireTime);
         }
         return this.statCache.get();
     }

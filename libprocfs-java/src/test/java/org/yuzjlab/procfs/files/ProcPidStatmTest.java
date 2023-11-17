@@ -9,7 +9,7 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 
 class ProcPidStatmTest {
     @Test
-    void assertRead () throws FileNotFoundException, ProcessBaseException {
+    void assertRead() throws FileNotFoundException, ProcessBaseException {
         var statmPath = new TestHelper().resolveResources("/proc_pid_statm.txt");
         var parsedStatm = new ProcPidStatm(statmPath);
         assertEquals(1574, parsedStatm.size);

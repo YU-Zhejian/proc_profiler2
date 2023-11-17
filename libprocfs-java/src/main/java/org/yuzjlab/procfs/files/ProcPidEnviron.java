@@ -31,28 +31,28 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
  * </b>check; see <code>ptrace(2)</code>.
  */
 public final class ProcPidEnviron {
-  private ProcPidEnviron() {}
+    private ProcPidEnviron() {}
 
-  /**
-   * Parse <code>/proc/[pid]/environ</code> file.
-   *
-   * @param pathToEnviron Path to the file that will be parsed
-   * @return Parsed environment file as a Map, with environment variable name as key and environment
-   *     variable value as value.
-   */
-  public static Map<String, String> parseEnviron(Path pathToEnviron) throws ProcessBaseException {
-    var environMap = new HashMap<String, String>();
-    try {
-      var environLine = Files.readString(pathToEnviron);
-      for (var environKeyValue : environLine.split("\\u0000")) {
-        var sepIdx = environKeyValue.indexOf('=');
-        var envKey = environKeyValue.substring(0, sepIdx);
-        var envValue = environKeyValue.substring(sepIdx + 1);
-        environMap.put(envKey, envValue);
-      }
-      return environMap;
-    } catch (IOException e) {
-      throw ProcessUtils.resolveIOException(e);
+    /**
+     * Parse <code>/proc/[pid]/environ</code> file.
+     *
+     * @param pathToEnviron Path to the file that will be parsed
+     * @return Parsed environment file as a Map, with environment variable name as key and
+     *     environment variable value as value.
+     */
+    public static Map<String, String> parseEnviron(Path pathToEnviron) throws ProcessBaseException {
+        var environMap = new HashMap<String, String>();
+        try {
+            var environLine = Files.readString(pathToEnviron);
+            for (var environKeyValue : environLine.split("\\u0000")) {
+                var sepIdx = environKeyValue.indexOf('=');
+                var envKey = environKeyValue.substring(0, sepIdx);
+                var envValue = environKeyValue.substring(sepIdx + 1);
+                environMap.put(envKey, envValue);
+            }
+            return environMap;
+        } catch (IOException e) {
+            throw ProcessUtils.resolveIOException(e);
+        }
     }
-  }
 }

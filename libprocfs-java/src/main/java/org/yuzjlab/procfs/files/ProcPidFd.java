@@ -83,33 +83,33 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
  * descriptor 0.
  */
 public final class ProcPidFd {
-  private ProcPidFd() {}
+    private ProcPidFd() {}
 
-  /**
-   * Return actual paths to file descriptors of a process.
-   *
-   * @return A map whose key is file descriptors and values are real paths to that descriptor.
-   */
-  public static Map<Integer, String> parseFD(Path pathOfFD) throws ProcessBaseException {
-    var parsedFD = new HashMap<Integer, String>();
-    try (var dstream = Files.newDirectoryStream(pathOfFD)) {
-      for (var path : dstream) {
-        var descriptor = Integer.parseInt(String.valueOf(path.getFileName()));
-        var realPath = ProcessUtils.resolveRealPath(path);
-        parsedFD.put(descriptor, realPath);
-      }
-    } catch (IOException e) {
-      throw ProcessUtils.resolveIOException(e);
+    /**
+     * Return actual paths to file descriptors of a process.
+     *
+     * @return A map whose key is file descriptors and values are real paths to that descriptor.
+     */
+    public static Map<Integer, String> parseFD(Path pathOfFD) throws ProcessBaseException {
+        var parsedFD = new HashMap<Integer, String>();
+        try (var dstream = Files.newDirectoryStream(pathOfFD)) {
+            for (var path : dstream) {
+                var descriptor = Integer.parseInt(String.valueOf(path.getFileName()));
+                var realPath = ProcessUtils.resolveRealPath(path);
+                parsedFD.put(descriptor, realPath);
+            }
+        } catch (IOException e) {
+            throw ProcessUtils.resolveIOException(e);
+        }
+        return parsedFD;
     }
-    return parsedFD;
-  }
 
-  /** Get number of opened file descriptors of a process. */
-  public static long getNumberOfFD(Path pathOfFD) throws ProcessBaseException {
-    try (var dstream = Files.newDirectoryStream(pathOfFD)) {
-      return StreamSupport.stream(dstream.spliterator(), false).count();
-    } catch (IOException e) {
-      throw ProcessUtils.resolveIOException(e);
+    /** Get number of opened file descriptors of a process. */
+    public static long getNumberOfFD(Path pathOfFD) throws ProcessBaseException {
+        try (var dstream = Files.newDirectoryStream(pathOfFD)) {
+            return StreamSupport.stream(dstream.spliterator(), false).count();
+        } catch (IOException e) {
+            throw ProcessUtils.resolveIOException(e);
+        }
     }
-  }
 }
