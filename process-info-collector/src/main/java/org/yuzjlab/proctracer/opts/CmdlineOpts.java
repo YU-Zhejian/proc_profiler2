@@ -5,7 +5,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 
-public class FEOpts {
+public class CmdlineOpts {
     public static final Option helpOption =
             Option.builder("h")
                     .longOpt("help")
@@ -125,7 +125,7 @@ public class FEOpts {
                     .addOption(configOption)
                     .addOption(testMainOption);
 
-    FEOpts() {}
+    CmdlineOpts() {}
 
     public static void printHelp() {
         var formatter = new HelpFormatter();

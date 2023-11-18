@@ -24,7 +24,7 @@ import org.yuzjlab.proctracer.frontend.FrontendInterface;
 import org.yuzjlab.proctracer.frontend.LogFrontend;
 import org.yuzjlab.proctracer.frontend.NOPFrontend;
 import org.yuzjlab.proctracer.frontend.SimpleFrontend;
-import org.yuzjlab.proctracer.opts.FEOpts;
+import org.yuzjlab.proctracer.opts.CmdlineOpts;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadFactory;
 import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadInterface;
@@ -78,8 +78,8 @@ public class Main {
             var pconfig = new PropertiesConfiguration();
             pconfig.copy(TracerOpts.getDefaultConfig());
             Writer defConfOutWriter;
-            if (cmd.hasOption(FEOpts.configOption)) {
-                outPath = cmd.getOptionValue(FEOpts.configOption);
+            if (cmd.hasOption(CmdlineOpts.configOption)) {
+                outPath = cmd.getOptionValue(CmdlineOpts.configOption);
                 defConfOutWriter = new FileWriter(outPath);
             } else {
                 outPath = "stdout";
@@ -99,14 +99,14 @@ public class Main {
     private static ProcessSupervisorThreadInterface createPSST(
             CommandLine cmd, Logger lh, String[] cmdLineArr) {
         ProcessSupervisorThreadInterface psst = null;
-        if (!cmd.hasOption(FEOpts.pidOption) && cmdLineArr.length == 0) {
+        if (!cmd.hasOption(CmdlineOpts.pidOption) && cmdLineArr.length == 0) {
             lh.error("At least one of the -p [PID] or [CMDS] needs to be specified!");
             System.exit(1);
-        } else if (cmd.hasOption(FEOpts.pidOption) && cmdLineArr.length != 0) {
+        } else if (cmd.hasOption(CmdlineOpts.pidOption) && cmdLineArr.length != 0) {
             lh.error("Only one of the -p [PID] or [CMDS] needs to be specified!");
             System.exit(1);
-        } else if (cmd.hasOption(FEOpts.pidOption)) {
-            var pidStr = cmd.getOptionValue(FEOpts.pidOption);
+        } else if (cmd.hasOption(CmdlineOpts.pidOption)) {
+            var pidStr = cmd.getOptionValue(CmdlineOpts.pidOption);
             var pid = -1L;
 
             try {
@@ -119,7 +119,7 @@ public class Main {
             psst = ProcessSupervisorThreadFactory.create(pid);
         } else {
             Map<String, String> env = null;
-            var envOptVal = cmd.getOptionValue(FEOpts.envOption);
+            var envOptVal = cmd.getOptionValue(CmdlineOpts.envOption);
             if (envOptVal != null) {
                 try {
                     env = parseEnv(new File(envOptVal));
@@ -136,18 +136,18 @@ public class Main {
                     ProcessSupervisorThreadFactory.create(
                             cmdLineArr,
                             new File(
-                                    FEOpts.getOptionValueWithDefaults(
-                                            cmd, FEOpts.stdinOption, TracerOpts.DEVNULL)),
+                                    CmdlineOpts.getOptionValueWithDefaults(
+                                            cmd, CmdlineOpts.stdinOption, TracerOpts.DEVNULL)),
                             new File(
-                                    FEOpts.getOptionValueWithDefaults(
-                                            cmd, FEOpts.stdoutOption, TracerOpts.DEVNULL)),
+                                    CmdlineOpts.getOptionValueWithDefaults(
+                                            cmd, CmdlineOpts.stdoutOption, TracerOpts.DEVNULL)),
                             new File(
-                                    FEOpts.getOptionValueWithDefaults(
-                                            cmd, FEOpts.stderrOption, TracerOpts.DEVNULL)),
+                                    CmdlineOpts.getOptionValueWithDefaults(
+                                            cmd, CmdlineOpts.stderrOption, TracerOpts.DEVNULL)),
                             new File(
-                                    FEOpts.getOptionValueWithDefaults(
+                                    CmdlineOpts.getOptionValueWithDefaults(
                                             cmd,
-                                            FEOpts.stdinOption,
+                                            CmdlineOpts.stdinOption,
                                             new File(".").getAbsolutePath())),
                             env);
         }
@@ -158,14 +158,14 @@ public class Main {
             String[] argsBeforeCmdLineArr, String[] cmdLineArr) throws ParseException {
         var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
         var parser = new DefaultParser();
-        var cmd = parser.parse(FEOpts.options, argsBeforeCmdLineArr);
+        var cmd = parser.parse(CmdlineOpts.options, argsBeforeCmdLineArr);
 
-        if (cmd.hasOption(FEOpts.helpOption)) {
-            FEOpts.printHelp();
+        if (cmd.hasOption(CmdlineOpts.helpOption)) {
+            CmdlineOpts.printHelp();
             System.exit(0);
         }
 
-        if (cmd.hasOption(FEOpts.testMainOption)) {
+        if (cmd.hasOption(CmdlineOpts.testMainOption)) {
             try {
                 TestMain.testMain();
             } catch (ProcessBaseException e) {
@@ -175,15 +175,15 @@ public class Main {
             System.exit(0);
         }
 
-        if (cmd.hasOption(FEOpts.writeDefaultConfigOption)) {
+        if (cmd.hasOption(CmdlineOpts.writeDefaultConfigOption)) {
             writeDefaultConfig(cmd, lh);
         }
 
         TracerOpts tracerOpts;
         String configPath = "null";
         try {
-            if (cmd.hasOption(FEOpts.configOption)) {
-                configPath = cmd.getOptionValue(FEOpts.configOption);
+            if (cmd.hasOption(CmdlineOpts.configOption)) {
+                configPath = cmd.getOptionValue(CmdlineOpts.configOption);
                 tracerOpts = TracerOpts.load(new File(configPath));
             } else {
                 configPath = "defaults";
@@ -197,19 +197,19 @@ public class Main {
         ProcessSupervisorThreadInterface psst = createPSST(cmd, lh, cmdLineArr);
 
         try {
-            tracerOpts.setCompressFmt(cmd.getOptionValue(FEOpts.compressFmtOption));
+            tracerOpts.setCompressFmt(cmd.getOptionValue(CmdlineOpts.compressFmtOption));
         } catch (ConfigurationException e) {
             throw new ParseException("--compress should be one of [GZ, XZ] or unspecified.");
         }
 
-        var outDirOptVal = cmd.getOptionValue(FEOpts.outdirOption);
+        var outDirOptVal = cmd.getOptionValue(CmdlineOpts.outdirOption);
         if (outDirOptVal == null) {
             throw new ParseException("--out-dir should be specified.");
         }
         tracerOpts.setOutDirPath(new File(outDirOptVal));
 
         try {
-            tracerOpts.setFrontEnd(cmd.getOptionValue(FEOpts.frontendImplOption));
+            tracerOpts.setFrontEnd(cmd.getOptionValue(CmdlineOpts.frontendImplOption));
         } catch (ConfigurationException e) {
             throw new ParseException(
                     "--frontendImpl should be one of [NOP, SIMPLE, LOG] or unspecified.");
@@ -246,7 +246,7 @@ public class Main {
             topt = psstToptPair.getRight();
         } catch (ParseException parseException) {
             lh.error("Parsing failed.  Reason: {}", parseException.getMessage());
-            FEOpts.printHelp();
+            CmdlineOpts.printHelp();
             System.exit(1);
         }
         var mainDispatcher = new MainDispatcher(topt, psst);
