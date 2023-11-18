@@ -5,23 +5,22 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.csv.CSVPrinter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.yuzjlab.proctracer.opts.TracerOpts;
-import org.yuzjlab.proctracer.utils.BaseConfigurable;
+import org.yuzjlab.proctracer.utils.BaseCanStop;
+import org.yuzjlab.proctracer.utils.ConfigurationManager;
+import org.yuzjlab.proctracer.utils.LogManager;
 
-public abstract class BaseDispatcher extends BaseConfigurable implements DispatcherInterface {
-    protected final Logger lh;
+public abstract class BaseDispatcher extends BaseCanStop implements DispatcherInterface {
+    protected final LogManager logManager;
     protected final TracerOpts topts;
     protected final CSVPrinter csvPrinter;
-    protected boolean shouldStop;
     protected Map<DispatcherInterface, Thread> childDispatcherThreadMap;
+    protected ConfigurationManager configurationManager;
 
-    @Override
-    public boolean getShouldStop() {
-        return this.shouldStop;
+    public void setShouldStop() {
+        this.logManager.lh.debug("SIGTERM received");
+        this.shouldStop = true;
     }
 
     public Map<String, String> recursiveFrontendFetch() {
@@ -33,10 +32,10 @@ public abstract class BaseDispatcher extends BaseConfigurable implements Dispatc
     }
 
     protected BaseDispatcher(TracerOpts topts, boolean createCsvPrinter) {
-        super(topts.getConfig());
         this.topts = topts;
-        this.lh = LoggerFactory.getLogger(this.toString());
-        lh.debug("Initializing...");
+        this.configurationManager = new ConfigurationManager(topts.getConfig(), this.getClass());
+        this.logManager = new LogManager(this);
+        this.logManager.lh.debug("Initializing...");
 
         CSVPrinter csvPrinter1;
         if (createCsvPrinter) {
@@ -46,7 +45,7 @@ public abstract class BaseDispatcher extends BaseConfigurable implements Dispatc
                                 Path.of(topts.getOutDirPath().toString(), this.toString())
                                         .toFile());
             } catch (IOException e) {
-                this.logError(e);
+                this.logManager.logError(e);
                 csvPrinter1 = null;
                 this.setShouldStop();
             }
@@ -56,12 +55,7 @@ public abstract class BaseDispatcher extends BaseConfigurable implements Dispatc
         this.csvPrinter = csvPrinter1;
 
         this.childDispatcherThreadMap = new HashMap<>();
-        lh.debug("Initialized");
-    }
-
-    public void setShouldStop() {
-        lh.debug("SIGTERM received");
-        this.shouldStop = true;
+        this.logManager.lh.debug("Initialized");
     }
 
     protected abstract void probe();
@@ -79,7 +73,7 @@ public abstract class BaseDispatcher extends BaseConfigurable implements Dispatc
     protected void addDispatcher(DispatcherInterface di) {
         var dit = new Thread(di, di.toString());
         dit.start();
-        lh.debug("Added child-dispatcher {}", di);
+        this.logManager.lh.debug("Added child-dispatcher {}", di);
         this.childDispatcherThreadMap.put(di, dit);
     }
 
@@ -87,10 +81,13 @@ public abstract class BaseDispatcher extends BaseConfigurable implements Dispatc
         if (this.shouldStop) {
             return;
         }
-        lh.debug("Running setup script...");
+        this.logManager.lh.debug("Running setup script...");
         setUp();
-        lh.debug("Running setup script FIN");
-        var interval = (int) (this.getConfigWithDefaults(Float.class, "interval") * 1000);
+        this.logManager.lh.debug("Running setup script FIN");
+        var interval =
+                (int)
+                        (this.configurationManager.getConfigWithDefaults(Float.class, "interval")
+                                * 1000);
         while (!this.shouldStop) {
             this.probe();
             var toRemove = new ArrayList<DispatcherInterface>();
@@ -129,19 +126,8 @@ public abstract class BaseDispatcher extends BaseConfigurable implements Dispatc
             }
         }
         this.childDispatcherThreadMap.clear();
-        lh.debug("Running termination script...");
+        this.logManager.lh.debug("Running termination script...");
         tearDown();
-        lh.debug("Running termination script FIN");
+        this.logManager.lh.debug("Running termination script FIN");
     }
-
-    protected void logError(Throwable e) {
-        lh.error("Failed because of {}", e.toString());
-    }
-
-    public static final Set<String> ALL_KNOWN_DISPATCHER_NAMES =
-            Set.of(
-                    "org.yuzjlab.proctracer.dispatcher.sys.SystemMemoryTracer",
-                    "org.yuzjlab.proctracer.dispatcher.MainDispatcher",
-                    "org.yuzjlab.proctracer.dispatcher.proc.ProcessMainDispatcher",
-                    "org.yuzjlab.proctracer.dispatcher.sys.SystemMainDispatcher");
 }

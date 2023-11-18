@@ -39,7 +39,7 @@ public class SystemMemoryTracer extends BaseDispatcher {
                     "RAM_BUFFER",
                     "RAM_CACHED");
         } catch (IOException e) {
-            this.logError(e);
+            this.logManager.logError(e);
         }
     }
 
@@ -60,7 +60,7 @@ public class SystemMemoryTracer extends BaseDispatcher {
                     this.cachedMemInfo.buffersKBytes,
                     this.cachedMemInfo.cachedKBytes);
         } catch (ProcessBaseException | IOException e) {
-            this.logError(e);
+            this.logManager.logError(e);
         }
     }
 
@@ -69,7 +69,7 @@ public class SystemMemoryTracer extends BaseDispatcher {
         try {
             this.csvPrinter.close();
         } catch (IOException e) {
-            this.logError(e);
+            this.logManager.logError(e);
         }
     }
 

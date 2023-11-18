@@ -26,7 +26,7 @@ public class ProcessMainDispatcher extends BaseDispatcher {
         try {
             eepi1 = new EagerEvaluatedProcessInfo(tracedPID);
         } catch (ProcessBaseException e) {
-            this.logError(e);
+            this.logManager.logError(e);
             eepi1 = null;
             this.setShouldStop();
         }
@@ -45,7 +45,7 @@ public class ProcessMainDispatcher extends BaseDispatcher {
                 }
             }
         } catch (ProcessBaseException e) {
-            this.logError(e);
+            this.logManager.logError(e);
             this.setShouldStop();
         }
     }

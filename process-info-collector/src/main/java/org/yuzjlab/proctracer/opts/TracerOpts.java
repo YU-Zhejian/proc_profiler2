@@ -9,6 +9,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.MapConfiguration;
@@ -19,12 +20,12 @@ import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.DuplicateHeaderMode;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
-import org.yuzjlab.proctracer.dispatcher.BaseDispatcher;
-import org.yuzjlab.proctracer.utils.BaseConfigurable;
+import org.yuzjlab.proctracer.utils.ConfigurationManager;
 
 @SuppressWarnings("unused")
 public class TracerOpts {
     public static final String DEVNULL = "/dev/null";
+    protected String frontendImplOptVal;
 
     public static final Map<String, Object> DEFAULT_CONFIG =
             Map.of(
@@ -34,8 +35,8 @@ public class TracerOpts {
                     0.5,
                     "backendRefreshFreq",
                     0.01,
-                    "suppressFrontend",
-                    false);
+                    "frontendImpl",
+                    "SIMPLE");
 
     protected static final CSVFormat yReacerCSVFormat =
             CSVFormat.Builder.create()
@@ -77,10 +78,11 @@ public class TracerOpts {
     public static Configuration getDefaultConfig() {
         var mc = new MapConfiguration(new HashMap<>());
 
-        mc.append(BaseConfigurable.getDefaultConfig(TracerOpts.class));
-        for (var dispatcherClassName : BaseDispatcher.ALL_KNOWN_DISPATCHER_NAMES) {
+        mc.append(ConfigurationManager.getDefaultConfig(TracerOpts.class));
+        for (var dispatcherClassName : ConfigurationManager.ALL_CONFIGURABLE) {
             try {
-                mc.append(BaseConfigurable.getDefaultConfig(Class.forName(dispatcherClassName)));
+                mc.append(
+                        ConfigurationManager.getDefaultConfig(Class.forName(dispatcherClassName)));
             } catch (ClassNotFoundException ignored) {
             }
         }
@@ -134,5 +136,19 @@ public class TracerOpts {
         }
         var appender = new OutputStreamWriter(ios);
         return new CSVPrinter(appender, yReacerCSVFormat);
+    }
+
+    public void setFrontEnd(String frontendImplOptVal) throws ConfigurationException {
+        var validFrontendImpl = Set.of("NOP", "SIMPLE", "LOG");
+        if (frontendImplOptVal == null || validFrontendImpl.contains(frontendImplOptVal)) {
+            this.frontendImplOptVal = frontendImplOptVal;
+            return;
+        }
+        throw new ConfigurationException(
+                "frontendImpl should be one of [NOP, SIMPLE, LOG] or unspecified.");
+    }
+
+    public String getFrontendImplOptVal() {
+        return this.frontendImplOptVal;
     }
 }

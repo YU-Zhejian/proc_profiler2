@@ -19,7 +19,7 @@ public class MainDispatcher extends BaseDispatcher {
         try {
             topt.validate();
         } catch (IOException e) {
-            this.logError(e);
+            this.logManager.logError(e);
             this.setShouldStop();
         }
     }
@@ -28,9 +28,13 @@ public class MainDispatcher extends BaseDispatcher {
     protected void setUp() {
         this.psstThread = new Thread(psst);
         psstThread.start();
+        var interval =
+                (int)
+                        (this.configurationManager.getConfigWithDefaults(Float.class, "interval")
+                                * 1000);
         while (psst.getStatus() == ProcessStatus.PENDING) {
             try {
-                Thread.sleep((int) (this.getConfigWithDefaults(Float.class, "interval") * 1000));
+                Thread.sleep(interval);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -40,8 +44,12 @@ public class MainDispatcher extends BaseDispatcher {
             this.setShouldStop();
             return;
         }
-        this.addDispatcher(new ProcessMainDispatcher(this.topts, tracedPID));
-        this.addDispatcher(new SystemMainDispatcher(this.topts));
+        if (this.configurationManager.getConfigWithDefaults(Boolean.class, "useSystemTracer")) {
+            this.addDispatcher(new ProcessMainDispatcher(this.topts, tracedPID));
+        }
+        if (this.configurationManager.getConfigWithDefaults(Boolean.class, "useProcessTracer")) {
+            this.addDispatcher(new SystemMainDispatcher(this.topts));
+        }
     }
 
     @Override
@@ -77,5 +85,9 @@ public class MainDispatcher extends BaseDispatcher {
         return 0;
     }
 
-    public static final Map<String, Object> DEFAULT_CONFIG = Map.of("interval", 0.01);
+    public static final Map<String, Object> DEFAULT_CONFIG =
+            Map.of(
+                    "interval", 0.01,
+                    "useSystemTracer", true,
+                    "useProcessTracer", true);
 }

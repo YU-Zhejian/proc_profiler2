@@ -22,7 +22,8 @@ public class SystemMainDispatcher extends BaseDispatcher {
 
     @Override
     protected void setUp() {
-        for (var loadTracer : this.getListConfigWithDefaults(String.class, "loadTracer")) {
+        for (var loadTracer :
+                this.configurationManager.getListConfigWithDefaults(String.class, "loadTracer")) {
             try {
                 var tracer = Class.forName(loadTracer);
                 if (!DispatcherInterface.class.isAssignableFrom(tracer)) {
@@ -35,7 +36,7 @@ public class SystemMainDispatcher extends BaseDispatcher {
                 this.addDispatcher(tracerInstance);
 
             } catch (Exception e) {
-                this.logError(e);
+                this.logManager.logError(e);
                 this.setShouldStop();
             }
         }
