@@ -81,7 +81,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public Iterable<Integer> getChildPIDs() throws ProcessBaseException {
+    public Iterable<Long> getChildPIDs() throws ProcessBaseException {
         // No cache for this method
         return this.eepi.getChildPIDs();
     }

@@ -7,10 +7,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.util.AbstractMap;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.zip.GZIPOutputStream;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.MapConfiguration;
@@ -22,9 +20,23 @@ import org.apache.commons.csv.DuplicateHeaderMode;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 import org.yuzjlab.proctracer.dispatcher.BaseDispatcher;
+import org.yuzjlab.proctracer.utils.BaseConfigurable;
 
+@SuppressWarnings("unused")
 public class TracerOpts {
     public static final String DEVNULL = "/dev/null";
+
+    public static final Map<String, Object> DEFAULT_CONFIG =
+            Map.of(
+                    "compressFmt",
+                    "PLAIN",
+                    "frontendRefreshFreq",
+                    0.5,
+                    "backendRefreshFreq",
+                    0.01,
+                    "suppressFrontend",
+                    false);
+
     protected static final CSVFormat yReacerCSVFormat =
             CSVFormat.Builder.create()
                     .setDelimiter('\t')
@@ -34,6 +46,15 @@ public class TracerOpts {
                     .build();
     protected CompressFmt compressFmt;
     protected long tracePID;
+
+    public long getTracePID() {
+        return tracePID;
+    }
+
+    public File getOutDirPath() {
+        return outDirPath;
+    }
+
     protected File outDirPath;
     protected Configuration config;
 
@@ -54,36 +75,22 @@ public class TracerOpts {
     }
 
     public static Configuration getDefaultConfig() {
-        var className = TracerOpts.class.getCanonicalName();
+        var mc = new MapConfiguration(new HashMap<>());
 
-        var mc = new MapConfiguration(
-                Stream.of(
-                                new AbstractMap.SimpleEntry<>("%s.compressFmt".formatted(className), "PLAIN"),
-                                new AbstractMap.SimpleEntry<>("%s.frontendRefreshFreq".formatted(className), 0.5),
-                                new AbstractMap.SimpleEntry<>("%s.backendRefreshFreq".formatted(className), 0.01),
-                                new AbstractMap.SimpleEntry<>("%s.suppressFrontend".formatted(className), false)
-                        )
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue))
-                );
-        for(var dispatcherClassName : BaseDispatcher.ALL_KNOWN_DISPATCHER_NAMES){
-            try{
-                Class<?> di = Class.forName(dispatcherClassName);
-                var gdc = di.getMethod("getDefaultConfig");
-                var result = (Configuration) gdc.invoke(null);
-                mc.append(result);
-            } catch (Exception ignored){
-                throw new RuntimeException(ignored);
+        mc.append(BaseConfigurable.getDefaultConfig(TracerOpts.class));
+        for (var dispatcherClassName : BaseDispatcher.ALL_KNOWN_DISPATCHER_NAMES) {
+            try {
+                mc.append(BaseConfigurable.getDefaultConfig(Class.forName(dispatcherClassName)));
+            } catch (ClassNotFoundException ignored) {
             }
-
         }
         return mc;
     }
 
-    public void validate() {
+    public void validate() throws IOException {
         this.outDirPath.mkdirs();
         if (this.outDirPath.exists() && !this.outDirPath.isDirectory()) {
-            throw new RuntimeException(
-                    "Failed to mkdir -p '%s'".formatted(this.outDirPath.toString()));
+            throw new IOException("Failed to mkdir -p '%s'".formatted(this.outDirPath.toString()));
         }
         if (this.compressFmt == null) {
             throw new NullPointerException();
@@ -114,12 +121,15 @@ public class TracerOpts {
 
     public CSVPrinter createCSVPrinter(File name) throws IOException {
         OutputStream ios;
-        var fStream = new FileOutputStream(name);
+        FileOutputStream fStream;
         if (this.compressFmt == CompressFmt.XZ) {
+            fStream = new FileOutputStream(name + ".tsv.xz");
             ios = new XZOutputStream(fStream, new LZMA2Options(9));
         } else if (this.compressFmt == CompressFmt.GZ) {
+            fStream = new FileOutputStream(name + ".tsv.gz");
             ios = new GZIPOutputStream(fStream);
         } else {
+            fStream = new FileOutputStream(name + ".tsv");
             ios = new BufferedOutputStream(fStream);
         }
         var appender = new OutputStreamWriter(ios);

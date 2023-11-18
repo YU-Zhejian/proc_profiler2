@@ -23,50 +23,50 @@ public class ProcMemInfo {
     /**
      * Total usable RAM (i.e., physical RAM minus a few reserved bits and the kernel binary code).
      */
-    protected final long memTotalKBytes;
+    public final long memTotalKBytes;
 
     /** The sum of LowFree+HighFree. Highmem is all memory above ~860 MB of physical memory. */
-    protected final long memFreeKBytes;
+    public final long memFreeKBytes;
 
     /**
      * An estimate of how much memory is available for starting new applications, without swapping.
      */
-    protected final long memAvailiableKBytes;
+    public final long memAvailiableKBytes;
 
     /**
      * Relatively temporary storage for raw disk blocks that shouldn't get tremendously large (20 MB
      * or so).
      */
-    protected final long buffersKBytes;
+    public final long buffersKBytes;
 
     /**
      * In-memory cache for files read from the disk (the page cache). Doesn't include SwapCached.
      */
-    protected final long cachedKBytes;
+    public final long cachedKBytes;
 
     /**
      * Memory that once was swapped out, is swapped back in but still also is in the swap file. (If
      * memory pressure is high, these pages don't need to be swapped out again because they are
      * already in the swap file. This saves I/O.)
      */
-    protected final long swapCachedKBytes;
+    public final long swapCachedKBytes;
 
     /**
      * Memory that has been used more recently and usually not reclaimed unless absolutely necessary
      */
-    protected final long activeKBytes;
+    public final long activeKBytes;
 
     /**
      * Memory which has been less recently used. It is more eligible to be reclaimed for other
      * purposes.
      */
-    protected final long inactiveKBytes;
+    public final long inactiveKBytes;
 
     /** Total amount of swap space available. */
-    protected final long swapTotalKBytes;
+    public final long swapTotalKBytes;
 
     /** Amount of swap space that is currently unused. */
-    protected final long swapFreeKBytes;
+    public final long swapFreeKBytes;
 
     public ProcMemInfo(Path pathToMeminfo) throws ProcessBaseException {
         var minfoHM = new HashMap<String, Long>();

@@ -10,8 +10,10 @@ public class PIDBasedProcessSupervisorThread extends BaseProcessSupervisorThread
 
     public PIDBasedProcessSupervisorThread(long pid) {
         try {
+            this.status = ProcessStatus.RUNNING;
             this.processInfo = new EagerEvaluatedProcessInfo(pid);
         } catch (ProcessBaseException processBaseException) {
+            this.status = ProcessStatus.TERMINATED;
             this.processInfo = null;
         }
     }
@@ -23,11 +25,12 @@ public class PIDBasedProcessSupervisorThread extends BaseProcessSupervisorThread
         }
         while (this.processInfo.isAlive()) {
             try {
-                sleep(1);
-            } catch (InterruptedException ignored) {
-
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
             }
         }
+        this.status = ProcessStatus.TERMINATED;
     }
 
     public long getPid() {

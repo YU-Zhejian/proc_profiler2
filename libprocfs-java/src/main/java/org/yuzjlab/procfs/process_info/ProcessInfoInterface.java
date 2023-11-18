@@ -49,7 +49,7 @@ public interface ProcessInfoInterface {
 
     Iterable<String> getMemoryMap() throws ProcessBaseException;
 
-    Iterable<Integer> getChildPIDs() throws ProcessBaseException;
+    Iterable<Long> getChildPIDs() throws ProcessBaseException;
 
     long getNumChildProcess() throws ProcessBaseException;
 

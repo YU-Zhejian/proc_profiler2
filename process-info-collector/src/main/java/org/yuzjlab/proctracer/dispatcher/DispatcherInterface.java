@@ -1,12 +1,13 @@
 package org.yuzjlab.proctracer.dispatcher;
 
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.MapConfiguration;
-
-import java.util.HashMap;
+import java.util.Map;
 
 public interface DispatcherInterface extends Runnable {
-    static Configuration getDefaultConfig() {
-        return new MapConfiguration(new HashMap<>());
-    }
+    Map<String, String> frontendFetch();
+
+    Map<String, String> recursiveFrontendFetch();
+
+    boolean getShouldStop();
+
+    void setShouldStop();
 }

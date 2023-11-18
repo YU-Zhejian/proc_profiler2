@@ -725,3 +725,4 @@ intellij-javadocs-*.xml
 .project
 .idea/remote-targets.xml
 exports.mk
+/test.out.d/

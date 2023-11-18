@@ -6,4 +6,6 @@ public interface ProcessSupervisorThreadInterface extends Runnable {
     int getExitValue();
 
     void kill(int signal);
+
+    public ProcessStatus getStatus();
 }

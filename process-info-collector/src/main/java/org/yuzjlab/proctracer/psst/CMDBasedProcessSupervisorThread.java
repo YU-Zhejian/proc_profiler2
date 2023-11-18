@@ -39,11 +39,13 @@ public class CMDBasedProcessSupervisorThread extends BaseProcessSupervisorThread
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        this.status = ProcessStatus.RUNNING;
         try {
             this.p.waitFor();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
+        this.status = ProcessStatus.TERMINATED;
     }
 
     public long getPid() {

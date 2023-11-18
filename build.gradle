@@ -19,3 +19,6 @@ googleJavaFormat {
     toolVersion = "1.18.1"
     options style: 'AOSP'
 }
+tasks.withType(JacocoBase){
+    options.encoding = "UTF-8"
+}

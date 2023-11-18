@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
 }
 
 
@@ -14,7 +15,8 @@ repositories {
 dependencies {
     implementation project(':libprocfs-java')
     compileOnly 'org.slf4j:slf4j-api:2.0.9'
-    runtimeOnly 'org.slf4j:slf4j-simple:2.0.9'
+    // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
+    runtimeOnly 'ch.qos.logback:logback-classic:1.4.11'
     // https://mvnrepository.com/artifact/commons-cli/commons-cli
     implementation 'commons-cli:commons-cli:1.6.0'
     // https://mvnrepository.com/artifact/org.tukaani/xz
@@ -29,7 +31,6 @@ dependencies {
     implementation 'com.github.jnr:jnr-posix:3.1.18'
     // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
     runtimeOnly 'commons-beanutils:commons-beanutils:1.9.4'
-
 }
 
 application {
@@ -37,4 +38,10 @@ application {
 }
 
 jar {
+    manifest {
+        attributes(
+                "Manifest-Version": 1.0,
+                'Main-Class': 'org.yuzjlab.proctracer.Main' //指定main方法所在的文件
+        )
+    }
 }

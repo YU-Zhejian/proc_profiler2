@@ -77,13 +77,13 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo implements Proces
         }
     }
 
-    private List<Integer> getChildPidsFromThreadDir(Path threadDirPath) {
+    private List<Long> getChildPidsFromThreadDir(Path threadDirPath) {
         try {
             return Arrays.stream(
                             Files.readString(Path.of(threadDirPath.toString(), "children"))
                                     .split(" "))
                     .filter((String s) -> !s.isEmpty())
-                    .map(Integer::parseInt)
+                    .map(Long::parseLong)
                     .toList();
         } catch (IOException | NumberFormatException ignored) {
             return new ArrayList<>();
@@ -91,8 +91,8 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo implements Proces
     }
 
     @Override
-    public Iterable<Integer> getChildPIDs() throws ProcessBaseException {
-        HashSet<Integer> pids = new HashSet<>();
+    public Iterable<Long> getChildPIDs() throws ProcessBaseException {
+        HashSet<Long> pids = new HashSet<>();
         try (var fs = Files.newDirectoryStream(Path.of(this.pathInProcfs.toString(), "task"))) {
             for (var threadDirPath : fs) {
                 pids.addAll(getChildPidsFromThreadDir(threadDirPath));
@@ -124,9 +124,7 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo implements Proces
     public float getCPUPercent(float waitNSeconds) throws ProcessBaseException {
         float cpuTimeAtStart = this.getCPUTime();
         try {
-            synchronized (this) {
-                this.wait((int) (waitNSeconds * 1000));
-            }
+            Thread.sleep((int) (waitNSeconds * 1000));
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }

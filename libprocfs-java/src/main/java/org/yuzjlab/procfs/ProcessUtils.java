@@ -49,6 +49,8 @@ public class ProcessUtils {
             selfProcPath = Path.of(getProcfsPath(), "self");
         } else if (Path.of(getProcfsPath(), "curproc").toFile().exists()) {
             selfProcPath = Path.of(getProcfsPath(), "curproc");
+        } else {
+            throw new ProcessBaseException(new FileNotFoundException("self process do not exist!"));
         }
         try {
             return Long.parseLong(selfProcPath.toRealPath().getFileName().toString());

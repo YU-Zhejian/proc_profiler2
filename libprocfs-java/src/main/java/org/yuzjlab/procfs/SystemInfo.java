@@ -15,7 +15,7 @@ public final class SystemInfo {
     public static final long PAGE_SIZE = POSIXFactory.getPOSIX().sysconf(Sysconf._SC_PAGE_SIZE);
     public static final long CLOCK_TICK = POSIXFactory.getPOSIX().sysconf(Sysconf._SC_CLK_TCK);
 
-    private SystemInfo() {}
+    public SystemInfo() {}
 
     public static Iterable<Integer> iterAllPids() throws ProcessBaseException {
         try (var dstream = Files.newDirectoryStream(Path.of(ProcessUtils.getProcfsPath()))) {
