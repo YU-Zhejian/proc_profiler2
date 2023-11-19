@@ -87,46 +87,28 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
         this.childDispatcherThreadMap.put(di, dit);
     }
 
-    public void run() {
-        if (this.shouldStop) {
-            return;
-        }
-        setUp();
-        if (this.shouldStop) {
-            return;
-        }
-        this.logManager.lh.debug("Running setup script FIN");
-        var interval =
-                (int)
-                        (this.configurationManager.getConfigWithDefaults(Float.class, "interval")
-                                * 1000);
-        while (!this.shouldStop) {
-            this.probe();
-            var toRemove = new ArrayList<DispatcherInterface>();
-            for (var childDispatcherThreadMapItem : this.childDispatcherThreadMap.entrySet()) {
-                if (childDispatcherThreadMapItem.getKey().getShouldStop()
-                        || (!childDispatcherThreadMapItem.getValue().isAlive())) {
-                    childDispatcherThreadMapItem.getKey().setShouldStop();
-                    try {
-                        synchronized (this) {
-                            childDispatcherThreadMapItem.getValue().join();
-                        }
-                    } catch (InterruptedException e) {
-                        Thread.currentThread().interrupt();
+    protected void removeFinishedChildDispatchers() {
+        var toRemove = new ArrayList<DispatcherInterface>();
+        for (var childDispatcherThreadMapItem : this.childDispatcherThreadMap.entrySet()) {
+            if (childDispatcherThreadMapItem.getKey().getShouldStop()
+                    || (!childDispatcherThreadMapItem.getValue().isAlive())) {
+                childDispatcherThreadMapItem.getKey().setShouldStop();
+                try {
+                    synchronized (this) {
+                        childDispatcherThreadMapItem.getValue().join();
                     }
-                    toRemove.add(childDispatcherThreadMapItem.getKey());
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
-            }
-            for (var toRemoveKey : toRemove) {
-                this.childDispatcherThreadMap.remove(toRemoveKey);
-            }
-
-            try {
-                Thread.sleep(interval);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                toRemove.add(childDispatcherThreadMapItem.getKey());
             }
         }
+        for (var toRemoveKey : toRemove) {
+            this.childDispatcherThreadMap.remove(toRemoveKey);
+        }
+    }
+
+    protected void terminateAllChildrDispatchers() {
         for (var childDispatcherThreadMapItem : this.childDispatcherThreadMap.entrySet()) {
             childDispatcherThreadMapItem.getKey().setShouldStop();
             try {
@@ -138,6 +120,28 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
             }
         }
         this.childDispatcherThreadMap.clear();
+    }
+
+    public void run() {
+        if (this.shouldStop) {
+            return;
+        }
+        setUp();
+        this.logManager.lh.debug("Running setup script FIN");
+        var interval =
+                (int)
+                        (this.configurationManager.getConfigWithDefaults(Float.class, "interval")
+                                * 1000);
+        while (!this.shouldStop) {
+            this.probe();
+            this.removeFinishedChildDispatchers();
+            try {
+                Thread.sleep(interval);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        this.terminateAllChildrDispatchers();
         this.logManager.lh.debug("Running termination script...");
         tearDown();
         this.logManager.lh.debug("Running termination script FIN");

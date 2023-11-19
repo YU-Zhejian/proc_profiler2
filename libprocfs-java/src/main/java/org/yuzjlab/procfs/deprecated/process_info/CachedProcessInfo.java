@@ -97,7 +97,7 @@ public class CachedProcessInfo extends BaseProcessInfo {
     }
 
     @Override
-    public float getCPUTime() throws ProcessBaseException {
+    public float getCPUTimeSeconds() throws ProcessBaseException {
         return 0; // TODO
     }
 

@@ -8,7 +8,7 @@ public class LogManager {
     public final Logger lh;
 
     public LogManager(Object target) {
-        this.lh = LoggerFactory.getLogger(target.toString());
+        this.lh = LoggerFactory.getLogger(target.getClass().getSimpleName());
     }
 
     public void logError(Throwable e) {

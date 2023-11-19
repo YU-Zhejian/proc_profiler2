@@ -8,9 +8,12 @@ import org.yuzjlab.procfs.SystemInfo;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.process_info.EagerEvaluatedProcessInfo;
 import org.yuzjlab.proctracer.Main;
+import org.yuzjlab.proctracer.frontend.FrontendUtils;
 
 public class TestMain {
+    private TestMain() {}
 
+    @SuppressWarnings("squid:S2629") // Loggers here must be instantly evaluated.
     public static void testMain() throws ProcessBaseException {
         var systemProperties = System.getProperties();
         var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
@@ -37,10 +40,10 @@ public class TestMain {
 
         var rt = Runtime.getRuntime();
         lh.info(
-                "JVM Memory (KB): Free/Total/Max {}/{}/{}",
-                rt.freeMemory() / 1024,
-                rt.totalMemory() / 1024,
-                rt.maxMemory() / 1024);
+                "JVM Memory: Free/Total/Max {}/{}/{}",
+                FrontendUtils.toHumanReadable(rt.freeMemory()),
+                FrontendUtils.toHumanReadable(rt.totalMemory()),
+                FrontendUtils.toHumanReadable(rt.maxMemory()));
 
         try {
             lh.info("procfs identified at {}", ProcessUtils.getProcfsPath());
@@ -78,13 +81,13 @@ public class TestMain {
         var io = p.getIO();
         lh.info(
                 "IO: rchar={}, wchar={}, rsyscall={}, wsyscall={}, rbytes={}, wbytes={}, cwbytes={}",
-                io.readChars,
-                io.writeChars,
+                FrontendUtils.toHumanReadable(io.readChars),
+                FrontendUtils.toHumanReadable(io.writeChars),
                 io.readSyscalls,
                 io.writeSyscalls,
-                io.readBytes,
-                io.writeBytes,
-                io.cancelledWriteBytes);
+                FrontendUtils.toHumanReadable(io.readBytes),
+                FrontendUtils.toHumanReadable(io.writeBytes),
+                FrontendUtils.toHumanReadable(io.cancelledWriteBytes));
 
         lh.info("FD:");
         var fd = p.getFileDescriptors();
@@ -92,16 +95,16 @@ public class TestMain {
             lh.info("\t{}: {}", fdItem.getKey(), fdItem.getValue());
         }
 
-        lh.info("CPU: {}% on {}", Math.round(p.getCPUPercent(5) * 100), p.getOnWhichCPU());
+        lh.info("CPU: {}% on {}", Math.round(p.getCPUPercent(1) * 100), p.getOnWhichCPU());
 
         var statm = p.getMemoryInformation();
         lh.info(
-                "MEM (KB): Virtual={}, Resident={}, Shared={}, Text/Data={}/{}",
-                statm.getSizeBytes() / 1024,
-                statm.getResidentBytes() / 1024,
-                statm.getSharedBytes() / 1024,
-                statm.getTextBytes() / 1024,
-                statm.getDataBytes() / 1024);
+                "MEM: Virtual={}, Resident={}, Shared={}, Text/Data={}/{}",
+                FrontendUtils.toHumanReadable(statm.getSizeBytes()),
+                FrontendUtils.toHumanReadable(statm.getResidentBytes()),
+                FrontendUtils.toHumanReadable(statm.getSharedBytes()),
+                FrontendUtils.toHumanReadable(statm.getTextBytes()),
+                FrontendUtils.toHumanReadable(statm.getDataBytes()));
 
         lh.info("Running libprocfs-java testing code FINISHED");
     }

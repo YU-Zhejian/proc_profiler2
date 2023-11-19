@@ -14,24 +14,22 @@ fmt:
 
 .PHONY: test_main
 test_main: build
+	mkdir -p test.out.d/
 	java \
-	-Dlogback.configurationFile=logback.xml \
-	-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
-	--help
+		-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
+		--help
 	java \
-	-Dlogback.configurationFile=logback.xml \
-	-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
-	--write-default-config --config test.out.d/default_config.properties
+		-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
+		--write-default-config \
+		--config test.out.d/default_config.properties
 	java \
-	-Dlogback.configurationFile=logback.xml \
-	-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
-	--test-main
+		-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
+		--test-main
 	java \
-	-Dlogback.configurationFile=logback.xml \
-	-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
-	--frontend-impl LOG \
-	-o test.out.d/test_sleep \
-	-- sleep 5
+		-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
+		--frontend-impl LOG \
+		-o test.out.d/test_sleep \
+		-- sleep 5
 
 .PHONY: test
 test:
@@ -40,9 +38,8 @@ test:
 .PHONY: test_calibrate
 test_calibrate: build
 	java \
-	-Dlogback.configurationFile=logback.xml \
-	-jar process-info-calibrator/build/libs/process-info-calibrator-1.0-SNAPSHOT-all.jar \
-	process-info-calibrator/oldTest/*/*
+		-jar process-info-calibrator/build/libs/process-info-calibrator-1.0-SNAPSHOT-all.jar \
+		process-info-calibrator/oldTest/*/*
 
 .PHONY: scc
 scc:

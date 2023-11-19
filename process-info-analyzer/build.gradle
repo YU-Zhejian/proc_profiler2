@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+
+group 'org.yuzjlab.proctracer'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
+    implementation 'org.apache.spark:spark-sql_2.13:3.5.0'
+}
+//
+//application {
+//    mainClass = 'org.yuzjlab.proctracer.Main'
+//}
+//
+//jar {
+//    manifest {
+//        attributes(
+//                "Manifest-Version": 1.0,
+//                'Main-Class': 'org.yuzjlab.proctracer.Main' //指定main方法所在的文件
+//        )
+//    }
+//}

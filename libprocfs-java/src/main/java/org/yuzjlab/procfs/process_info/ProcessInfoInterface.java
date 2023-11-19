@@ -55,7 +55,7 @@ public interface ProcessInfoInterface {
 
     int getOnWhichCPU() throws ProcessBaseException;
 
-    float getCPUTime() throws ProcessBaseException;
+    float getCPUTimeSeconds() throws ProcessBaseException;
 
     float getCPUPercent(float waitNSeconds) throws ProcessBaseException;
 

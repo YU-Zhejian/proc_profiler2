@@ -3,7 +3,8 @@ rootProject.name = 'proc_profiler2'
 include ':libprocfs-java'
 include ':process-info-collector'
 include ':process-info-calibrator'
+include ':process-info-analyzer'
 
-project(':libprocfs-java').projectDir = "$rootDir/libprocfs-java" as File
-project(':process-info-collector').projectDir = "$rootDir/process-info-collector" as File
-project(':process-info-calibrator').projectDir = "$rootDir/process-info-calibrator" as File
+//project(':libprocfs-java').projectDir = "$rootDir/libprocfs-java" as File
+//project(':process-info-collector').projectDir = "$rootDir/process-info-collector" as File
+//project(':process-info-calibrator').projectDir = "$rootDir/process-info-calibrator" as File

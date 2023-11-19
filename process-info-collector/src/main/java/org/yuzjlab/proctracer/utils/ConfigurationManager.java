@@ -45,23 +45,23 @@ public class ConfigurationManager {
     protected Configuration config;
     private final Configuration defaultConfig;
 
-    public <T> T getConfigWithDefaults(Class<T> cls, String localKey) {
+    protected String checkKey(String localKey) {
         var canonicalKey = "%s.%s".formatted(this.className, localKey);
         if (!this.defaultConfig.containsKey(canonicalKey)) {
             throw new RuntimeException(
                     "Key %s not contained in default config of class %s!"
                             .formatted(canonicalKey, this.className));
         }
+        return canonicalKey;
+    }
+
+    public <T> T getConfigWithDefaults(Class<T> cls, String localKey) {
+        var canonicalKey = this.checkKey(localKey);
         return this.config.get(cls, canonicalKey, this.defaultConfig.get(cls, canonicalKey));
     }
 
     public <T> List<T> getListConfigWithDefaults(Class<T> cls, String localKey) {
-        var canonicalKey = "%s.%s".formatted(this.className, localKey);
-        if (!this.defaultConfig.containsKey(canonicalKey)) {
-            throw new RuntimeException(
-                    "Key %s not contained in default config of class %s!"
-                            .formatted(canonicalKey, this.className));
-        }
+        var canonicalKey = this.checkKey(localKey);
         return this.config.getList(cls, canonicalKey, defaultConfig.getList(cls, canonicalKey));
     }
 }

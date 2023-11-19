@@ -41,7 +41,7 @@ dependencies {
     implementation 'com.github.jnr:jnr-posix:3.1.18'
 
     // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
-    runtimeOnly 'commons-beanutils:commons-beanutils:1.9.4'
+    implementation 'commons-beanutils:commons-beanutils:1.9.4'
 }
 
 application {

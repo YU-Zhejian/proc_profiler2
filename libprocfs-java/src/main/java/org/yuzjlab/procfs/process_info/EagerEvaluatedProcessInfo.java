@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.yuzjlab.procfs.ProcessUtils;
+import org.yuzjlab.procfs.SystemInfo;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcPidEnviron;
 import org.yuzjlab.procfs.files.ProcPidFd;
@@ -114,21 +115,21 @@ public class EagerEvaluatedProcessInfo extends BaseProcessInfo implements Proces
     }
 
     @Override
-    public float getCPUTime() throws ProcessBaseException {
+    public float getCPUTimeSeconds() throws ProcessBaseException {
         var stat = this.getStat();
-        return (stat.utime + stat.stime);
+        return ((float) (stat.utime + stat.stime)) / SystemInfo.CLOCK_TICK;
     }
 
     @Override
     @SuppressWarnings("squid:S2274") // I need a wait here
     public float getCPUPercent(float waitNSeconds) throws ProcessBaseException {
-        float cpuTimeAtStart = this.getCPUTime();
+        float cpuTimeAtStart = this.getCPUTimeSeconds();
         try {
             Thread.sleep((int) (waitNSeconds * 1000));
         } catch (InterruptedException ignored) {
             Thread.currentThread().interrupt();
         }
-        float cpuTimeAtEnd = this.getCPUTime();
+        float cpuTimeAtEnd = this.getCPUTimeSeconds();
         return (cpuTimeAtEnd - cpuTimeAtStart) / waitNSeconds;
     }
 
