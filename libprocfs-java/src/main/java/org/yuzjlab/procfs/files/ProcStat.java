@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.SystemInfo;
@@ -106,23 +107,27 @@ public class ProcStat {
                     new RuntimeException("proc/stat file contains no cpu line!"));
         }
 
-        Scanner scn = new Scanner(cpuLine);
-        scn.next();
-        this.cpuUser = scn.nextLong();
-        this.cpuNice = scn.nextLong();
-        this.cpuSystem = scn.nextLong();
-        this.cpuIdle = scn.nextLong();
-        this.cpuIOWait = scn.nextLong();
-        this.cpuIrq = scn.nextLong();
-        this.cpuSoftIrq = scn.nextLong();
-        this.cpuSteal = scn.nextLong();
-        this.cpuGuest = scn.nextLong();
-        this.cpuGuestNice = scn.nextLong();
-        this.ctxt = getTrailingLong(lines, "ctxt");
-        this.process = getTrailingLong(lines, "processes");
-        this.procsBlocked = getTrailingLong(lines, "procs_blocked");
-        this.procsRunning = getTrailingLong(lines, "procs_running");
-        this.btime = getTrailingLong(lines, "btime");
+        try {
+            Scanner scn = new Scanner(cpuLine);
+            scn.next();
+            this.cpuUser = scn.nextLong();
+            this.cpuNice = scn.nextLong();
+            this.cpuSystem = scn.nextLong();
+            this.cpuIdle = scn.nextLong();
+            this.cpuIOWait = scn.nextLong();
+            this.cpuIrq = scn.nextLong();
+            this.cpuSoftIrq = scn.nextLong();
+            this.cpuSteal = scn.nextLong();
+            this.cpuGuest = scn.nextLong();
+            this.cpuGuestNice = scn.nextLong();
+            this.ctxt = getTrailingLong(lines, "ctxt");
+            this.process = getTrailingLong(lines, "processes");
+            this.procsBlocked = getTrailingLong(lines, "procs_blocked");
+            this.procsRunning = getTrailingLong(lines, "procs_running");
+            this.btime = getTrailingLong(lines, "btime");
+        } catch (NoSuchElementException e) {
+            throw ProcessUtils.resolveIOException(e);
+        }
     }
 
     protected static long getTrailingLong(List<String> lines, String prefix)

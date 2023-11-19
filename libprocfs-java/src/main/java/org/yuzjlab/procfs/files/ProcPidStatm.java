@@ -3,6 +3,7 @@ package org.yuzjlab.procfs.files;
 import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.SystemInfo;
@@ -60,7 +61,7 @@ public class ProcPidStatm {
             scn.nextLong(); // dirty pages (unused since Linux 2.6; always 0)
         } catch (IOException e) {
             throw ProcessUtils.resolveIOException(e);
-        } catch (NumberFormatException e) {
+        } catch (NumberFormatException | NoSuchElementException e) {
             throw ProcessUtils.resolveIOException(new IOException(e));
         }
     }

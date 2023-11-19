@@ -14,6 +14,7 @@ repositories {
 
 dependencies {
     implementation project(':libprocfs-java')
+    implementation project(':process-info-collector')
     implementation 'org.slf4j:slf4j-api:2.0.9'
 
     // https://mvnrepository.com/artifact/ch.qos.logback/logback-classic
@@ -45,14 +46,14 @@ dependencies {
 }
 
 application {
-    mainClass = 'org.yuzjlab.proctracer.Main'
+    mainClass = 'org.yuzjlab.proctracer.MainTest'
 }
 
 jar {
     manifest {
         attributes(
                 "Manifest-Version": 1.0,
-                'Main-Class': 'org.yuzjlab.proctracer.Main' //指定main方法所在的文件
+                'Main-Class': 'org.yuzjlab.proctracer.MainTest'
         )
     }
 }

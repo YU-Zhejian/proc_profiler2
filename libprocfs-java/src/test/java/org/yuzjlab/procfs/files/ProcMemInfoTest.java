@@ -10,7 +10,7 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 class ProcMemInfoTest {
     @Test
     public void assertRead() throws FileNotFoundException, ProcessBaseException {
-        var statPath = new TestHelper().resolveResources("/proc_meminfo.txt");
+        var statPath = new TestHelper().resolveResources("proc_meminfo.txt");
         var stat = new ProcMemInfo(statPath);
         assertEquals(27560236L, stat.memAvailiableKBytes);
         assertEquals(5679124L, stat.activeKBytes);

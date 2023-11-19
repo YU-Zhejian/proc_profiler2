@@ -12,7 +12,7 @@ class ProcPidMapsTest {
 
     @Test
     void parseMaps() throws FileNotFoundException, ProcessBaseException {
-        var mapsPath = new TestHelper().resolveResources("/proc_pid_maps.txt");
+        var mapsPath = new TestHelper().resolveResources("proc_pid_maps.txt");
         var parsedMMap = new TreeSet<String>();
         parsedMMap.add("/bin/sh");
         parsedMMap.add("/lib/libedit.so.8");

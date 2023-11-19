@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="4">
+  <component name="AdditionalModuleElements">
+    <content url="file://$MODULE_DIR$/../../../process-info-calibrator" dumb="true">
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-calibrator/oldTest/py/calibrate_cpu.py.out.d" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-calibrator/oldTest/py/calibrate_cputime.py.out.d" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-calibrator/oldTest/py/calibrate_disk.py.out.d" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-calibrator/oldTest/py/calibrate_fork_speed.py.out.d" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-calibrator/oldTest/py/calibrate_mem.py.out.d" />
+      <excludeFolder url="file://$MODULE_DIR$/../../../process-info-calibrator/oldTest/sh/dd_xz.sh.out.d" />
+    </content>
+  </component>
+  <component name="SonarLintModuleSettings">
+    <option name="uniqueId" value="2e996248-73df-4536-8205-677fb22d9b2e" />
+  </component>
+</module>

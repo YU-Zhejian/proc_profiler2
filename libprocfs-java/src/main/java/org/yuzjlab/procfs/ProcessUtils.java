@@ -61,7 +61,7 @@ public class ProcessUtils {
         }
     }
 
-    public static ProcessBaseException resolveIOException(IOException e) {
+    public static ProcessBaseException resolveIOException(Throwable e) {
         if (e instanceof FileNotFoundException fileNotFoundException) {
             return new ProcessNotExistException(fileNotFoundException);
         }

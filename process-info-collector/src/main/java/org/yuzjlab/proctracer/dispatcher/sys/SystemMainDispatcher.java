@@ -3,11 +3,10 @@ package org.yuzjlab.proctracer.dispatcher.sys;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.yuzjlab.proctracer.dispatcher.BaseDispatcher;
-import org.yuzjlab.proctracer.dispatcher.DispatcherInterface;
+import org.yuzjlab.proctracer.dispatcher.DispatcherFactory;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
-public class SystemMainDispatcher extends BaseDispatcher {
+public class SystemMainDispatcher extends BaseSystemTracer {
 
     public static final Map<String, Object> DEFAULT_CONFIG =
             Map.of(
@@ -21,35 +20,14 @@ public class SystemMainDispatcher extends BaseDispatcher {
     }
 
     @Override
-    protected void setUp() {
-        for (var loadTracer :
-                this.configurationManager.getListConfigWithDefaults(String.class, "loadTracer")) {
-            try {
-                var tracer = Class.forName(loadTracer);
-                if (!DispatcherInterface.class.isAssignableFrom(tracer)) {
-                    throw new IllegalArgumentException("%s is not a dispatcher!".formatted(tracer));
-                }
-                var tracerInstance =
-                        (DispatcherInterface)
-                                tracer.getDeclaredConstructor(TracerOpts.class)
-                                        .newInstance(this.topts);
-                this.addDispatcher(tracerInstance);
-
-            } catch (Exception e) {
-                this.logManager.logError(e);
-                this.setShouldStop();
-            }
-        }
-    }
-
-    @Override
     protected void probe() {
         // Do nothing.
     }
 
     @Override
-    protected long getID() {
-        return 0;
+    protected void setUp() {
+        super.setUp();
+        DispatcherFactory.systemSetUp(this);
     }
 
     @Override

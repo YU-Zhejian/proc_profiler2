@@ -7,11 +7,10 @@ import java.util.Map;
 import org.yuzjlab.procfs.SystemInfo;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcMemInfo;
-import org.yuzjlab.proctracer.dispatcher.BaseDispatcher;
 import org.yuzjlab.proctracer.frontend.FrontendUtils;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
-public class SystemMemoryTracer extends BaseDispatcher {
+public class SystemMemoryTracer extends BaseSystemTracer {
     protected final SystemInfo sysInfo;
     protected ProcMemInfo cachedMemInfo;
 
@@ -25,6 +24,7 @@ public class SystemMemoryTracer extends BaseDispatcher {
 
     @Override
     protected void setUp() {
+        super.setUp();
         try {
             this.csvPrinter.printRecord(
                     "TIME",
@@ -40,6 +40,7 @@ public class SystemMemoryTracer extends BaseDispatcher {
                     "RAM_CACHED");
         } catch (IOException e) {
             this.logManager.logError(e);
+            this.setShouldStop();
         }
     }
 
@@ -65,15 +66,6 @@ public class SystemMemoryTracer extends BaseDispatcher {
     }
 
     @Override
-    protected void tearDown() {
-        try {
-            this.csvPrinter.close();
-        } catch (IOException e) {
-            this.logManager.logError(e);
-        }
-    }
-
-    @Override
     public Map<String, String> frontendFetch() {
         if (this.cachedMemInfo == null) {
             return new HashMap<>();
@@ -88,10 +80,5 @@ public class SystemMemoryTracer extends BaseDispatcher {
                                 this.cachedMemInfo.memAvailiableKBytes * 1024),
                 "sys.swap.avail",
                         FrontendUtils.toHumanReadable(this.cachedMemInfo.swapFreeKBytes * 1024));
-    }
-
-    @Override
-    protected long getID() {
-        return 0;
     }
 }

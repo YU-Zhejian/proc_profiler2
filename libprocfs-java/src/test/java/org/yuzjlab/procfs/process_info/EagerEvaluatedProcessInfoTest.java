@@ -1,13 +1,16 @@
 package org.yuzjlab.procfs.process_info;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.condition.OS.WINDOWS;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
 import org.yuzjlab.procfs.ProcessUtils;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 
+@DisabledOnOs(WINDOWS)
 class EagerEvaluatedProcessInfoTest {
     private final EagerEvaluatedProcessInfo p;
     private final ProcessHandle ph;

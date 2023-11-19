@@ -33,6 +33,17 @@ test_main: build
 	-o test.out.d/test_sleep \
 	-- sleep 5
 
+.PHONY: test
+test:
+	./gradlew test
+
+.PHONY: test_calibrate
+test_calibrate: build
+	java \
+	-Dlogback.configurationFile=logback.xml \
+	-jar process-info-calibrator/build/libs/process-info-calibrator-1.0-SNAPSHOT-all.jar \
+	process-info-calibrator/oldTest/*/*
+
 .PHONY: scc
 scc:
 	bash scc.sh

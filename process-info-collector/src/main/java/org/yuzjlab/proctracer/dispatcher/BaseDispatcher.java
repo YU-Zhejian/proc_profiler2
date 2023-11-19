@@ -12,14 +12,18 @@ import org.yuzjlab.proctracer.utils.ConfigurationManager;
 import org.yuzjlab.proctracer.utils.LogManager;
 
 public abstract class BaseDispatcher extends BaseCanStop implements DispatcherInterface {
-    protected final LogManager logManager;
+    protected LogManager logManager;
     protected final TracerOpts topts;
-    protected final CSVPrinter csvPrinter;
+    protected CSVPrinter csvPrinter;
     protected Map<DispatcherInterface, Thread> childDispatcherThreadMap;
     protected ConfigurationManager configurationManager;
+    private final boolean createCsvPrinter;
 
+    @Override
     public void setShouldStop() {
-        this.logManager.lh.debug("SIGTERM received");
+        if (this.logManager != null) {
+            this.logManager.lh.debug("SIGTERM received");
+        }
         this.shouldStop = true;
     }
 
@@ -34,35 +38,41 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
     protected BaseDispatcher(TracerOpts topts, boolean createCsvPrinter) {
         this.topts = topts;
         this.configurationManager = new ConfigurationManager(topts.getConfig(), this.getClass());
-        this.logManager = new LogManager(this);
-        this.logManager.lh.debug("Initializing...");
+        this.createCsvPrinter = createCsvPrinter;
 
-        CSVPrinter csvPrinter1;
-        if (createCsvPrinter) {
+        this.childDispatcherThreadMap = new HashMap<>();
+    }
+
+    protected abstract void probe();
+
+    protected void setUp() {
+        this.logManager = new LogManager(this);
+        this.logManager.lh.debug("Running setup script...");
+        if (this.createCsvPrinter) {
             try {
-                csvPrinter1 =
+                this.csvPrinter =
                         topts.createCSVPrinter(
                                 Path.of(topts.getOutDirPath().toString(), this.toString())
                                         .toFile());
             } catch (IOException e) {
                 this.logManager.logError(e);
-                csvPrinter1 = null;
+                this.csvPrinter = null;
                 this.setShouldStop();
             }
         } else {
-            csvPrinter1 = null;
+            this.csvPrinter = null;
         }
-        this.csvPrinter = csvPrinter1;
-
-        this.childDispatcherThreadMap = new HashMap<>();
-        this.logManager.lh.debug("Initialized");
     }
 
-    protected abstract void probe();
-
-    protected void setUp() {}
-
-    protected void tearDown() {}
+    protected void tearDown() {
+        if (this.createCsvPrinter) {
+            try {
+                this.csvPrinter.close();
+            } catch (IOException e) {
+                this.logManager.logError(e);
+            }
+        }
+    }
 
     protected abstract long getID();
 
@@ -81,8 +91,10 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
         if (this.shouldStop) {
             return;
         }
-        this.logManager.lh.debug("Running setup script...");
         setUp();
+        if (this.shouldStop) {
+            return;
+        }
         this.logManager.lh.debug("Running setup script FIN");
         var interval =
                 (int)

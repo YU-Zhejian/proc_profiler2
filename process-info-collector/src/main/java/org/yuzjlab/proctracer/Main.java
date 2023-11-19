@@ -13,7 +13,6 @@ import java.util.Map;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
@@ -75,8 +74,7 @@ public class Main {
     private static void writeDefaultConfig(CommandLine cmd, Logger lh) {
         String outPath = "null";
         try {
-            var pconfig = new PropertiesConfiguration();
-            pconfig.copy(TracerOpts.getDefaultConfig());
+            var defaultTopt = new TracerOpts(TracerOpts.getDefaultConfig());
             Writer defConfOutWriter;
             if (cmd.hasOption(CmdlineOpts.configOption)) {
                 outPath = cmd.getOptionValue(CmdlineOpts.configOption);
@@ -85,7 +83,7 @@ public class Main {
                 outPath = "stdout";
                 defConfOutWriter = new OutputStreamWriter(System.out);
             }
-            pconfig.write(defConfOutWriter);
+            defaultTopt.save(defConfOutWriter);
         } catch (IOException | ConfigurationException e) {
             lh.error("Exception detected: %s".formatted(e.getMessage()));
             lh.error("Failed to write default configuration to '%s'!".formatted(outPath));
@@ -209,7 +207,7 @@ public class Main {
         tracerOpts.setOutDirPath(new File(outDirOptVal));
 
         try {
-            tracerOpts.setFrontEnd(cmd.getOptionValue(CmdlineOpts.frontendImplOption));
+            tracerOpts.setFrontEndImpl(cmd.getOptionValue(CmdlineOpts.frontendImplOption));
         } catch (ConfigurationException e) {
             throw new ParseException(
                     "--frontendImpl should be one of [NOP, SIMPLE, LOG] or unspecified.");
@@ -234,21 +232,7 @@ public class Main {
         return fe;
     }
 
-    public static void main(String[] args) {
-        Locale.setDefault(new Locale("en", "US"));
-        var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
-        var argPair = splitArgsBeforeAfterCmd(args);
-        ProcessSupervisorThreadInterface psst = null;
-        TracerOpts topt = null;
-        try {
-            var psstToptPair = parseArgs(argPair.getLeft(), argPair.getRight());
-            psst = psstToptPair.getLeft();
-            topt = psstToptPair.getRight();
-        } catch (ParseException parseException) {
-            lh.error("Parsing failed.  Reason: {}", parseException.getMessage());
-            CmdlineOpts.printHelp();
-            System.exit(1);
-        }
+    public static void performTrace(TracerOpts topt, ProcessSupervisorThreadInterface psst) {
         var mainDispatcher = new MainDispatcher(topt, psst);
         FrontendInterface frontend = frontendFactory(topt, mainDispatcher);
         var frontendThread = new Thread(frontend);
@@ -266,5 +250,23 @@ public class Main {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
+    }
+
+    public static void main(String[] args) {
+        Locale.setDefault(new Locale("en", "US"));
+        var lh = LoggerFactory.getLogger(Main.class.getCanonicalName());
+        var argPair = splitArgsBeforeAfterCmd(args);
+        ProcessSupervisorThreadInterface psst = null;
+        TracerOpts topt = null;
+        try {
+            var psstToptPair = parseArgs(argPair.getLeft(), argPair.getRight());
+            psst = psstToptPair.getLeft();
+            topt = psstToptPair.getRight();
+        } catch (ParseException parseException) {
+            lh.error("Parsing failed.  Reason: {}", parseException.getMessage());
+            CmdlineOpts.printHelp();
+            System.exit(1);
+        }
+        performTrace(topt, psst);
     }
 }

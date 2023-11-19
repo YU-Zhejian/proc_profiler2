@@ -3,6 +3,7 @@ package org.yuzjlab.procfs.files;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.TreeSet;
 import org.yuzjlab.procfs.ProcessUtils;
@@ -42,7 +43,7 @@ public class ProcPidMaps {
                             .map(ProcPidMaps::getLastToken)
                             .filter((String s) -> !s.equals("0"))
                             .toList());
-        } catch (IOException e) {
+        } catch (IOException | NoSuchElementException e) {
             throw ProcessUtils.resolveIOException(e);
         }
     }

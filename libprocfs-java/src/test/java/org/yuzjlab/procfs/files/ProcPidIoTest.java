@@ -10,7 +10,7 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 class ProcPidIoTest {
     @Test
     void parseEnviron() throws FileNotFoundException, ProcessBaseException {
-        var ioPath = new TestHelper().resolveResources("/proc_pid_io.txt");
+        var ioPath = new TestHelper().resolveResources("proc_pid_io.txt");
         var parsedEnviron = new ProcPidIo(ioPath);
         assertEquals(323934931, parsedEnviron.readChars);
         assertEquals(323929600, parsedEnviron.writeChars);

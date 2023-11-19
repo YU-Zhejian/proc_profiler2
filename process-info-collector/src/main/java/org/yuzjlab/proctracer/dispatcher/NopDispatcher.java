@@ -10,6 +10,11 @@ public class NopDispatcher extends BaseDispatcher {
         super(topt, false);
     }
 
+    @SuppressWarnings("unused") // To be API-compatible
+    public NopDispatcher(TracerOpts topt, Long tracePID) {
+        super(topt, false);
+    }
+
     @Override
     protected void probe() {
         // Do nothing

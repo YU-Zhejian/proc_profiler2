@@ -3,6 +3,7 @@ package org.yuzjlab.proctracer.dispatcher;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.yuzjlab.proctracer.dispatcher.proc.ProcessMainDispatcher;
 import org.yuzjlab.proctracer.dispatcher.sys.SystemMainDispatcher;
 import org.yuzjlab.proctracer.opts.TracerOpts;
@@ -18,7 +19,7 @@ public class MainDispatcher extends BaseDispatcher {
         this.psst = psst;
         try {
             topt.validate();
-        } catch (IOException e) {
+        } catch (IOException | ConfigurationException e) {
             this.logManager.logError(e);
             this.setShouldStop();
         }
@@ -26,6 +27,7 @@ public class MainDispatcher extends BaseDispatcher {
 
     @Override
     protected void setUp() {
+        super.setUp();
         this.psstThread = new Thread(psst);
         psstThread.start();
         var interval =
@@ -44,10 +46,14 @@ public class MainDispatcher extends BaseDispatcher {
             this.setShouldStop();
             return;
         }
-        if (this.configurationManager.getConfigWithDefaults(Boolean.class, "useSystemTracer")) {
+        if (Boolean.TRUE.equals(
+                this.configurationManager.getConfigWithDefaults(
+                        Boolean.class, "useSystemTracer"))) {
             this.addDispatcher(new ProcessMainDispatcher(this.topts, tracedPID));
         }
-        if (this.configurationManager.getConfigWithDefaults(Boolean.class, "useProcessTracer")) {
+        if (Boolean.TRUE.equals(
+                this.configurationManager.getConfigWithDefaults(
+                        Boolean.class, "useProcessTracer"))) {
             this.addDispatcher(new SystemMainDispatcher(this.topts));
         }
     }
@@ -61,6 +67,7 @@ public class MainDispatcher extends BaseDispatcher {
 
     @Override
     protected void tearDown() {
+        super.tearDown();
         synchronized (this) {
             try {
                 this.psstThread.join();

@@ -4,9 +4,12 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -14,10 +17,13 @@ import java.util.zip.GZIPOutputStream;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfigurationLayout;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.DuplicateHeaderMode;
+import org.apache.commons.io.FileUtils;
 import org.tukaani.xz.LZMA2Options;
 import org.tukaani.xz.XZOutputStream;
 import org.yuzjlab.proctracer.utils.ConfigurationManager;
@@ -28,15 +34,7 @@ public class TracerOpts {
     protected String frontendImplOptVal;
 
     public static final Map<String, Object> DEFAULT_CONFIG =
-            Map.of(
-                    "compressFmt",
-                    "PLAIN",
-                    "frontendRefreshFreq",
-                    0.5,
-                    "backendRefreshFreq",
-                    0.01,
-                    "frontendImpl",
-                    "SIMPLE");
+            Map.of("compressFmt", "PLAIN", "frontendImpl", "SIMPLE");
 
     protected static final CSVFormat yReacerCSVFormat =
             CSVFormat.Builder.create()
@@ -67,13 +65,31 @@ public class TracerOpts {
         var className = TracerOpts.class.getCanonicalName();
         this.config = config;
         this.setCompressFmt(config.getString("%s.compressFmt".formatted(className), null));
+        this.setFrontEndImpl(config.getString("%s.frontendImpl".formatted(className), null));
     }
 
     public static TracerOpts load(File configPath) throws ConfigurationException, IOException {
         var config = new PropertiesConfiguration();
+        config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
         config.read(new FileReader(configPath));
         return new TracerOpts(config);
     }
+
+    public void save(Writer writer) throws ConfigurationException, IOException {
+        var outConfig = new PropertiesConfiguration();
+        var layOut = new PropertiesConfigurationLayout();
+        layOut.setForceSingleLine(true);
+        outConfig.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
+        outConfig.setLayout(layOut);
+        outConfig.copy(this.config);
+        outConfig.write(writer);
+    }
+
+    public void save(File configPath) throws ConfigurationException, IOException {
+        this.save(new FileWriter(configPath));
+    }
+
+    // setSingleLine()
 
     public static Configuration getDefaultConfig() {
         var mc = new MapConfiguration(new HashMap<>());
@@ -83,24 +99,24 @@ public class TracerOpts {
             try {
                 mc.append(
                         ConfigurationManager.getDefaultConfig(Class.forName(dispatcherClassName)));
-            } catch (ClassNotFoundException ignored) {
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
             }
         }
         return mc;
     }
 
-    public void validate() throws IOException {
-        this.outDirPath.mkdirs();
+    public void validate() throws IOException, ConfigurationException {
+        FileUtils.deleteQuietly(this.outDirPath);
+        FileUtils.forceMkdir(this.outDirPath);
         if (this.outDirPath.exists() && !this.outDirPath.isDirectory()) {
             throw new IOException("Failed to mkdir -p '%s'".formatted(this.outDirPath.toString()));
         }
         if (this.compressFmt == null) {
             throw new NullPointerException();
         }
-    }
-
-    public void setTracePID(long tracePID) {
-        this.tracePID = tracePID;
+        this.save(
+                new File(Path.of(String.valueOf(this.outDirPath), "config.properties").toString()));
     }
 
     public void setOutDirPath(File outDirPath) {
@@ -138,7 +154,7 @@ public class TracerOpts {
         return new CSVPrinter(appender, yReacerCSVFormat);
     }
 
-    public void setFrontEnd(String frontendImplOptVal) throws ConfigurationException {
+    public void setFrontEndImpl(String frontendImplOptVal) throws ConfigurationException {
         var validFrontendImpl = Set.of("NOP", "SIMPLE", "LOG");
         if (frontendImplOptVal == null || validFrontendImpl.contains(frontendImplOptVal)) {
             this.frontendImplOptVal = frontendImplOptVal;

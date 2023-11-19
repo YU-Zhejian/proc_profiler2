@@ -11,22 +11,22 @@ class ProcStatTest {
 
     @Test
     void assertRead() throws FileNotFoundException, ProcessBaseException {
-        var statPath = new TestHelper().resolveResources("/proc_stat.txt");
+        var statPath = new TestHelper().resolveResources("proc_stat.txt");
         var stat = new ProcStat(statPath);
-        assertEquals(stat.cpuUser, 378312L);
-        assertEquals(stat.cpuNice, 1431L);
-        assertEquals(stat.cpuSystem, 102527L);
-        assertEquals(stat.cpuIdle, 12358934L);
-        assertEquals(stat.cpuIOWait, 2158L);
-        assertEquals(stat.cpuIrq, 0L);
-        assertEquals(stat.cpuSoftIrq, 8000L);
-        assertEquals(stat.cpuSteal, 0L);
-        assertEquals(stat.cpuGuest, 0L);
-        assertEquals(stat.cpuGuestNice, 0L);
-        assertEquals(stat.ctxt, 59483848L);
-        assertEquals(stat.process, 33812L);
-        assertEquals(stat.procsBlocked, 0L);
-        assertEquals(stat.procsRunning, 1L);
-        assertEquals(stat.btime, 1699882876L);
+        assertEquals(378312L, stat.cpuUser);
+        assertEquals(1431L, stat.cpuNice);
+        assertEquals(102527L, stat.cpuSystem);
+        assertEquals(12358934L, stat.cpuIdle);
+        assertEquals(2158L, stat.cpuIOWait);
+        assertEquals(0L, stat.cpuIrq);
+        assertEquals(8000L, stat.cpuSoftIrq);
+        assertEquals(0L, stat.cpuSteal);
+        assertEquals(0L, stat.cpuGuest);
+        assertEquals(0L, stat.cpuGuestNice);
+        assertEquals(59483848L, stat.ctxt);
+        assertEquals(33812L, stat.process);
+        assertEquals(0L, stat.procsBlocked);
+        assertEquals(1L, stat.procsRunning);
+        assertEquals(1699882876L, stat.btime);
     }
 }

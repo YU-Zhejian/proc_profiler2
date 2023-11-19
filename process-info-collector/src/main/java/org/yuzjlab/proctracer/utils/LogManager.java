@@ -12,6 +12,6 @@ public class LogManager {
     }
 
     public void logError(Throwable e) {
-        this.lh.error("Failed because of {}", e.toString());
+        this.lh.debug("Failed because of {}", e.toString());
     }
 }
