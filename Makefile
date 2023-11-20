@@ -41,6 +41,10 @@ test_calibrate: build
 		-jar process-info-calibrator/build/libs/process-info-calibrator-1.0-SNAPSHOT-all.jar \
 		process-info-calibrator/oldTest/*/*
 
+.PHONY: test_spark
+test_spark: build
+	 ./sparkw process-info-analyzer/build/libs/process-info-analyzer-1.0-SNAPSHOT-all.jar
+
 .PHONY: scc
 scc:
 	bash scc.sh

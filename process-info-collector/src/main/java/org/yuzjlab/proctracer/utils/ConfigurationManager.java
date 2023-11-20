@@ -23,7 +23,11 @@ public class ConfigurationManager {
             var retHM = new HashMap<String, Object>();
             var gdc = cls.getField("DEFAULT_CONFIG");
             Object defConfObj = gdc.get(null);
-            assert defConfObj instanceof Map;
+            if (!(defConfObj instanceof Map)) {
+                throw new ClassNotFoundException(
+                        "DEFAULT_CONFIG field of class %s is not Map!"
+                                .formatted(cls.getCanonicalName()));
+            }
             var mc = new HashMap<>((Map<String, Object>) defConfObj);
             for (var kv : mc.entrySet()) {
                 retHM.put("%s.%s".formatted(className, kv.getKey()), kv.getValue());
@@ -44,6 +48,11 @@ public class ConfigurationManager {
 
     protected Configuration config;
     private final Configuration defaultConfig;
+
+    public boolean containsKey(String localKey) {
+        var canonicalKey = "%s.%s".formatted(this.className, localKey);
+        return this.defaultConfig.containsKey(canonicalKey);
+    }
 
     protected String checkKey(String localKey) {
         var canonicalKey = "%s.%s".formatted(this.className, localKey);

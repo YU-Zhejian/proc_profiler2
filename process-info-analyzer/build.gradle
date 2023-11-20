@@ -5,7 +5,7 @@ plugins {
 }
 
 
-group 'org.yuzjlab.proctracer'
+group 'org.yuzjlab.procanalyzer'
 version '1.0-SNAPSHOT'
 
 repositories {
@@ -14,18 +14,30 @@ repositories {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.apache.spark/spark-sql
-    implementation 'org.apache.spark:spark-sql_2.13:3.5.0'
+    compileOnly 'org.apache.spark:spark-sql_2.13:3.5.0'
+
+    // https://mvnrepository.com/artifact/org.apache.spark/spark-mllib
+    compileOnly 'org.apache.spark:spark-mllib_2.13:3.5.0'
+
+    implementation 'org.slf4j:slf4j-api:2.0.9'
+    runtimeOnly 'com.esotericsoftware:kryo:4.0.2'
+
+    // https://mvnrepository.com/artifact/commons-beanutils/commons-beanutils
+    runtimeOnly 'commons-beanutils:commons-beanutils:1.9.4'
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-configuration2
+    implementation 'org.apache.commons:commons-configuration2:2.9.0'
 }
-//
-//application {
-//    mainClass = 'org.yuzjlab.proctracer.Main'
-//}
-//
-//jar {
-//    manifest {
-//        attributes(
-//                "Manifest-Version": 1.0,
-//                'Main-Class': 'org.yuzjlab.proctracer.Main' //指定main方法所在的文件
-//        )
-//    }
-//}
+
+application {
+    mainClass = 'org.yuzjlab.procanalyzer.Main'
+}
+
+jar {
+    manifest {
+        attributes(
+                "Manifest-Version": 1.0,
+                'Main-Class': 'org.yuzjlab.procanalyzer.Main'
+        )
+    }
+}

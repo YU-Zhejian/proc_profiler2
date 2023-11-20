@@ -6,11 +6,22 @@ import java.util.HashMap;
 import java.util.Map;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcPidStatm;
+import org.yuzjlab.proctracer.dispatcher.CsvPolicy;
 import org.yuzjlab.proctracer.frontend.FrontendUtils;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
 public class ProcessMemoryTracer extends BaseProcessTracer {
     protected ProcPidStatm cachedProcPidStatm;
+    public static final CsvPolicy CSV_POLICY =
+            new CsvPolicy(
+                    ProcessMemoryTracer.class,
+                    new String[] {
+                        "TIME", "RAM_VIRTUAL", "RAM_RESIDENT", "RAN_SHARED", "RAN_DATA", "RAN_TEXT"
+                    },
+                    new String[] {
+                        "Time:MilliSecSinceEpoch", "Long", "Long", "Long", "Long", "Long"
+                    },
+                    new Boolean[] {false, false, false, false, false, false});
 
     public ProcessMemoryTracer(TracerOpts topts, Long tracePID) {
         super(topts, true, tracePID);
@@ -23,8 +34,7 @@ public class ProcessMemoryTracer extends BaseProcessTracer {
     protected void setUp() {
         super.setUp();
         try {
-            this.csvPrinter.printRecord(
-                    "TIME", "RAM_VIRTUAL", "RAM_RESIDENT", "RAN_SHARED", "RAN_DATA", "RAN_TEXT");
+            CSV_POLICY.writeHeader(this.csvPrinter);
         } catch (IOException e) {
             this.logManager.logError(e);
             this.setShouldStop();

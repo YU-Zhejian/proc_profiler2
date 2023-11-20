@@ -726,3 +726,4 @@ intellij-javadocs-*.xml
 .idea/remote-targets.xml
 exports.mk
 /test.out.d/
+/third_party

@@ -7,12 +7,45 @@ import java.util.Map;
 import org.yuzjlab.procfs.SystemInfo;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcMemInfo;
+import org.yuzjlab.proctracer.dispatcher.CsvPolicy;
 import org.yuzjlab.proctracer.frontend.FrontendUtils;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
 public class SystemMemoryTracer extends BaseSystemTracer {
     protected final SystemInfo sysInfo;
     protected ProcMemInfo cachedMemInfo;
+    public static final CsvPolicy CSV_POLICY =
+            new CsvPolicy(
+                    SystemMemoryTracer.class,
+                    new String[] {
+                        "TIME",
+                        "RAM_TOTAL",
+                        "SWAP_TOTAL",
+                        "RAM_FREE",
+                        "RAM_AVAIL",
+                        "SWAP_CACHED",
+                        "SWAP_FREE",
+                        "RAM_ACTIVE",
+                        "RAM_INACTIVE",
+                        "RAM_BUFFER",
+                        "RAM_CACHED"
+                    },
+                    new String[] {
+                        "Time:MilliSecSinceEpoch",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long",
+                        "Long"
+                    },
+                    new Boolean[] {
+                        false, false, false, false, false, false, false, false, false, false, false
+                    });
 
     public SystemMemoryTracer(TracerOpts topts) {
         super(topts, true);
@@ -26,18 +59,7 @@ public class SystemMemoryTracer extends BaseSystemTracer {
     protected void setUp() {
         super.setUp();
         try {
-            this.csvPrinter.printRecord(
-                    "TIME",
-                    "RAM_TOTAL",
-                    "SWAP_TOTAL",
-                    "RAM_FREE",
-                    "RAM_AVAIL",
-                    "SWAP_CACHED",
-                    "SWAP_FREE",
-                    "RAM_ACTIVE",
-                    "RAM_INACTIVE",
-                    "RAM_BUFFER",
-                    "RAM_CACHED");
+            CSV_POLICY.writeHeader(this.csvPrinter);
         } catch (IOException e) {
             this.logManager.logError(e);
             this.setShouldStop();

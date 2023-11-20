@@ -30,6 +30,11 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
     public Map<String, String> recursiveFrontendFetch() {
         var hm = new HashMap<>(this.frontendFetch());
         for (var childDispatcher : this.childDispatcherThreadMap.keySet()) {
+            if (childDispatcher == this) {
+                throw new RuntimeException(
+                        "%s (%s) is a child of it self"
+                                .formatted(this.toString(), this.getClass().getCanonicalName()));
+            }
             hm.putAll(childDispatcher.recursiveFrontendFetch());
         }
         return hm;

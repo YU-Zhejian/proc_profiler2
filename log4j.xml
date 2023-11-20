@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" debug="true" >
+    <Appenders>
+        <Console name="Console" target="SYSTEM_ERR">
+            <PatternLayout pattern="[%p][%d{yy-MM-dd-HH:mm:ss.SSS}][%c]%m%n"/>
+        </Console>
+        <Console name="SparkConsole" target="SYSTEM_ERR">
+            <PatternLayout pattern="[%p][%d{yy-MM-dd-HH:mm:ss.SSS}][%c]%m%n"/>
+            <ThresholdFilter level="warn"/>
+        </Console>
+        <File name="SparkLog" fileName="spark.log">
+            <PatternLayout pattern="[%p][%d{yy-MM-dd-HH:mm:ss.SSS}][%c]%m%n"/>
+        </File>
+        <File name="AppLog" fileName="YuZJLab.ProcAnalyzer.log">
+            <PatternLayout pattern="[%p][%d{yy-MM-dd-HH:mm:ss.SSS}][%c]%m%n"/>
+        </File>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="YUZJLab.ProcAnalyzer" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="AppLog"/>
+        </Logger>
+        <Root level="info">
+            <AppenderRef ref="SparkConsole"/>
+            <AppenderRef ref="SparkLog"/>
+        </Root>
+    </Loggers>
+</Configuration>

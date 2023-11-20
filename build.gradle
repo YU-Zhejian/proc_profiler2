@@ -18,6 +18,8 @@ repositories {
 googleJavaFormat {
     toolVersion = "1.18.1"
     options style: 'AOSP'
+
+    exclude 'third_party/**/*.java'
 }
 tasks.withType(JacocoBase){
     options.encoding = "UTF-8"

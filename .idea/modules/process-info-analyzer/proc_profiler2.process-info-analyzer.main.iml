@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module version="4">
+  <component name="AdditionalModuleElements">
+    <content url="file://$MODULE_DIR$/../../../process-info-analyzer/src/main" dumb="true">
+      <sourceFolder url="file://$MODULE_DIR$/../../../process-info-analyzer/src/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../../../process-info-analyzer/src/main/resources" type="java-resource" />
+    </content>
+  </component>
   <component name="SonarLintModuleSettings">
     <option name="uniqueId" value="80f8f362-330c-4c5c-84e1-2ef940efc142" />
   </component>

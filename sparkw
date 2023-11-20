@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Spark wrapper
+set -ue
+THIS_DIR="$(readlink -f "$(dirname "${0}")")"
+SPARK_HOME="${THIS_DIR}/third_party/spark-3.5.0-bin-hadoop3-scala2.13"
+LOG_CONF="${THIS_DIR}/log4j.xml"
+
+mkdir -p "${SPARK_HOME}"
+if [ ! -d "${SPARK_HOME}" ]; then
+	cd "${THIS_DIR}/third_party/"
+	wget https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3-scala2.13.tgz
+	tar -xvzf spark-3.5.0-bin-hadoop3-scala2.13.tgz
+fi
+export PATH="${SPARK_HOME}/bin:${PATH}"
+
+spark-submit \
+    --files "${LOG_CONF}" \
+    --conf spark.driver.extraJavaOptions="-Dlog4j.configurationFile=file://${LOG_CONF}" \
+    --conf spark.executor.extraJavaOptions="-Dlog4j.configurationFile=file://${LOG_CONF}" \
+    --executor-memory 20G \
+    --driver-memory 20G \
+    "${@}"
