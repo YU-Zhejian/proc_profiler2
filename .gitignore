@@ -727,3 +727,4 @@ intellij-javadocs-*.xml
 exports.mk
 /test.out.d/
 /third_party
+/.idea/modules/

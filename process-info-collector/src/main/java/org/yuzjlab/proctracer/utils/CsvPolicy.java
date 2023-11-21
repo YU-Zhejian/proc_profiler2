@@ -1,7 +1,6 @@
 package org.yuzjlab.proctracer.utils;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -41,7 +40,8 @@ public class CsvPolicy {
                     .setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW)
                     .build();
 
-    public CSVPrinter createCSVPrinter(String fileName, CompressFmt compressFmt) throws IOException {
+    public CSVPrinter createCSVPrinter(String fileName, CompressFmt compressFmt)
+            throws IOException {
         OutputStream ios;
         FileOutputStream fStream;
         fileName = fileName + ".tsv";
