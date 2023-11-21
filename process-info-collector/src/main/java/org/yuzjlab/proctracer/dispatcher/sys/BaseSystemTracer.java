@@ -5,8 +5,8 @@ import org.yuzjlab.proctracer.opts.TracerOpts;
 
 public abstract class BaseSystemTracer extends BaseDispatcher {
 
-    protected BaseSystemTracer(TracerOpts topts, boolean createCsvPrinter) {
-        super(topts, createCsvPrinter);
+    protected BaseSystemTracer(TracerOpts topts) {
+        super(topts);
     }
 
     @Override

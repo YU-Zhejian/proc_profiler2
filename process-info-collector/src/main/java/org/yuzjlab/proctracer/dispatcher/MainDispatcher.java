@@ -20,6 +20,7 @@ import org.yuzjlab.proctracer.opts.TracerOpts;
 import org.yuzjlab.proctracer.psst.ProcessStatus;
 import org.yuzjlab.proctracer.psst.ProcessSupervisorThreadInterface;
 import org.yuzjlab.proctracer.utils.ConfigurationManager;
+import org.yuzjlab.proctracer.utils.CsvPolicy;
 
 public class MainDispatcher extends BaseDispatcher {
     protected ProcessSupervisorThreadInterface psst;
@@ -27,7 +28,7 @@ public class MainDispatcher extends BaseDispatcher {
     protected long setUpTimeStamp;
 
     public MainDispatcher(TracerOpts topt, ProcessSupervisorThreadInterface psst) {
-        super(topt, false);
+        super(topt);
         this.psst = psst;
         try {
             topt.validate();
@@ -90,17 +91,9 @@ public class MainDispatcher extends BaseDispatcher {
     protected Iterable<CsvPolicy> getAllCsvPolicies() {
         var csvPolicies = new ArrayList<CsvPolicy>();
         for (var dispatcher : this.preloadAllTracer()) {
-            try {
-                var csvPolicy = dispatcher.getField("CSV_POLICY").get(null);
-                if (!(csvPolicy instanceof CsvPolicy)) {
-                    throw new ClassNotFoundException(
-                            "CSV_POLICY field of class %s is not CsvPolicy!"
-                                    .formatted(dispatcher.getCanonicalName()));
-                }
-                csvPolicies.add((CsvPolicy) csvPolicy);
-            } catch (NoSuchFieldException
-                    | IllegalAccessException
-                    | ClassNotFoundException ignored) {
+            var csvPolicy = BaseDispatcher.getCsvPolicy(dispatcher);
+            if (csvPolicy != null) {
+                csvPolicies.add(csvPolicy);
             }
         }
         return csvPolicies;
@@ -132,6 +125,7 @@ public class MainDispatcher extends BaseDispatcher {
     @Override
     protected void setUp() {
         super.setUp();
+        this.logManager.lh.info("Main dispatcher added");
         this.setUpTimeStamp = Instant.now().toEpochMilli();
         this.psstThread = new Thread(psst);
         this.psstThread.start();
@@ -189,6 +183,7 @@ public class MainDispatcher extends BaseDispatcher {
     @Override
     protected void tearDown() {
         super.tearDown();
+        this.logManager.lh.info("Main dispatcher shutting down");
         synchronized (this) {
             try {
                 this.psstThread.join();

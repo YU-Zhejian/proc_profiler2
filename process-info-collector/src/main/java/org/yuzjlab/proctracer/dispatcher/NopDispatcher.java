@@ -4,15 +4,15 @@ import java.util.Collections;
 import java.util.Map;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
+@SuppressWarnings("unused")
 public class NopDispatcher extends BaseDispatcher {
 
     public NopDispatcher(TracerOpts topt) {
-        super(topt, false);
+        super(topt);
     }
 
-    @SuppressWarnings("unused") // To be API-compatible
     public NopDispatcher(TracerOpts topt, Long tracePID) {
-        super(topt, false);
+        super(topt);
     }
 
     @Override

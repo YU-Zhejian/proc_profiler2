@@ -6,9 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/libprocfs-java/proc_profiler2.libprocfs-java.iml" filepath="$PROJECT_DIR$/.idea/modules/libprocfs-java/proc_profiler2.libprocfs-java.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/process-info-analyzer/proc_profiler2.process-info-analyzer.main.iml" filepath="$PROJECT_DIR$/.idea/modules/process-info-analyzer/proc_profiler2.process-info-analyzer.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/process-info-calibrator/proc_profiler2.process-info-calibrator.iml" filepath="$PROJECT_DIR$/.idea/modules/process-info-calibrator/proc_profiler2.process-info-calibrator.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/process-info-calibrator/proc_profiler2.process-info-calibrator.main.iml" filepath="$PROJECT_DIR$/.idea/modules/process-info-calibrator/proc_profiler2.process-info-calibrator.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/process-info-collector/proc_profiler2.process-info-collector.iml" filepath="$PROJECT_DIR$/.idea/modules/process-info-collector/proc_profiler2.process-info-collector.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/process-info-collector/proc_profiler2.process-info-collector.main.iml" filepath="$PROJECT_DIR$/.idea/modules/process-info-collector/proc_profiler2.process-info-collector.main.iml" />
     </modules>
   </component>
 </project>

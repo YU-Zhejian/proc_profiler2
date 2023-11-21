@@ -6,10 +6,11 @@ SPARK_HOME="${THIS_DIR}/third_party/spark-3.5.0-bin-hadoop3-scala2.13"
 LOG_CONF="${THIS_DIR}/log4j.xml"
 
 mkdir -p "${SPARK_HOME}"
-if [ ! -d "${SPARK_HOME}" ]; then
+if [ ! -f "${SPARK_HOME}/bin/spark-submit" ]; then
 	cd "${THIS_DIR}/third_party/"
 	wget https://dlcdn.apache.org/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3-scala2.13.tgz
 	tar -xvzf spark-3.5.0-bin-hadoop3-scala2.13.tgz
+	cd -
 fi
 export PATH="${SPARK_HOME}/bin:${PATH}"
 

@@ -1,31 +1,21 @@
 package org.yuzjlab.proctracer.opts;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.zip.GZIPOutputStream;
 import org.apache.commons.configuration2.Configuration;
 import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.PropertiesConfigurationLayout;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVPrinter;
-import org.apache.commons.csv.DuplicateHeaderMode;
 import org.apache.commons.io.FileUtils;
-import org.tukaani.xz.LZMA2Options;
-import org.tukaani.xz.XZOutputStream;
 import org.yuzjlab.proctracer.utils.ConfigurationManager;
 
 @SuppressWarnings("unused")
@@ -34,15 +24,7 @@ public class TracerOpts {
     protected String frontendImplOptVal;
 
     public static final Map<String, Object> DEFAULT_CONFIG =
-            Map.of("compressFmt", "PLAIN", "frontendImpl", "SIMPLE");
-
-    protected static final CSVFormat yReacerCSVFormat =
-            CSVFormat.Builder.create()
-                    .setDelimiter('\t')
-                    .setQuote('\'')
-                    .setRecordSeparator('\n')
-                    .setDuplicateHeaderMode(DuplicateHeaderMode.DISALLOW)
-                    .build();
+            Map.of("compressFmt", CompressFmt.PLAIN.toString(), "frontendImpl", "SIMPLE");
     protected CompressFmt compressFmt;
     protected long tracePID;
 
@@ -59,6 +41,10 @@ public class TracerOpts {
 
     public Configuration getConfig() {
         return this.config;
+    }
+
+    public CompressFmt getCompressFmt() {
+        return this.compressFmt;
     }
 
     public TracerOpts(Configuration config) throws ConfigurationException {
@@ -82,6 +68,12 @@ public class TracerOpts {
         outConfig.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
         outConfig.setLayout(layOut);
         outConfig.copy(this.config);
+        outConfig.setProperty(
+                "%s.compressFmt".formatted(this.getClass().getCanonicalName()),
+                this.compressFmt.toString());
+        outConfig.setProperty(
+                "%s.frontendImpl".formatted(this.getClass().getCanonicalName()),
+                this.frontendImplOptVal);
         outConfig.write(writer);
     }
 
@@ -124,34 +116,11 @@ public class TracerOpts {
     }
 
     public void setCompressFmt(String compressOptVal) throws ConfigurationException {
-        if (compressOptVal != null) {
-            switch (compressOptVal) {
-                case "GZ" -> this.compressFmt = CompressFmt.GZ;
-                case "XZ" -> this.compressFmt = CompressFmt.XZ;
-                case "PLAIN" -> this.compressFmt = CompressFmt.PLAIN;
-                default -> throw new ConfigurationException(
-                        "compressFmt should be one of [GZ, XZ] or unspecified.");
-            }
-        } else {
-            this.compressFmt = CompressFmt.PLAIN;
+        try {
+            this.compressFmt = CompressFmt.fromString(compressOptVal);
+        } catch (ClassNotFoundException e) {
+            throw new ConfigurationException(e);
         }
-    }
-
-    public CSVPrinter createCSVPrinter(File name) throws IOException {
-        OutputStream ios;
-        FileOutputStream fStream;
-        if (this.compressFmt == CompressFmt.XZ) {
-            fStream = new FileOutputStream(name + ".tsv.xz");
-            ios = new XZOutputStream(fStream, new LZMA2Options(9));
-        } else if (this.compressFmt == CompressFmt.GZ) {
-            fStream = new FileOutputStream(name + ".tsv.gz");
-            ios = new GZIPOutputStream(fStream);
-        } else {
-            fStream = new FileOutputStream(name + ".tsv");
-            ios = new BufferedOutputStream(fStream);
-        }
-        var appender = new OutputStreamWriter(ios);
-        return new CSVPrinter(appender, yReacerCSVFormat);
     }
 
     public void setFrontEndImpl(String frontendImplOptVal) throws ConfigurationException {

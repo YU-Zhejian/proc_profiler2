@@ -10,8 +10,8 @@ public abstract class BaseProcessTracer extends BaseDispatcher {
     protected EagerEvaluatedProcessInfo eepi;
     protected long tracePID;
 
-    protected BaseProcessTracer(TracerOpts topts, boolean createCsvPrinter, long tracePID) {
-        super(topts, createCsvPrinter);
+    protected BaseProcessTracer(TracerOpts topts, long tracePID) {
+        super(topts);
         this.eepi = null;
         this.tracePID = tracePID;
     }

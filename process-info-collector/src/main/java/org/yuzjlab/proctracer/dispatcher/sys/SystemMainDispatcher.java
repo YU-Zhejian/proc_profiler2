@@ -6,6 +6,7 @@ import java.util.Map;
 import org.yuzjlab.proctracer.dispatcher.DispatcherFactory;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
+@SuppressWarnings("unused")
 public class SystemMainDispatcher extends BaseSystemTracer {
 
     public static final Map<String, Object> DEFAULT_CONFIG =
@@ -16,7 +17,7 @@ public class SystemMainDispatcher extends BaseSystemTracer {
                     List.of("org.yuzjlab.proctracer.dispatcher.sys.SystemMemoryTracer"));
 
     public SystemMainDispatcher(TracerOpts topts) {
-        super(topts, false);
+        super(topts);
     }
 
     @Override
@@ -28,6 +29,13 @@ public class SystemMainDispatcher extends BaseSystemTracer {
     protected void setUp() {
         super.setUp();
         DispatcherFactory.systemSetUp(this);
+        this.logManager.lh.info("System dispatcher added");
+    }
+
+    @Override
+    protected void tearDown() {
+        super.tearDown();
+        this.logManager.lh.info("System dispatcher shutting down");
     }
 
     @Override

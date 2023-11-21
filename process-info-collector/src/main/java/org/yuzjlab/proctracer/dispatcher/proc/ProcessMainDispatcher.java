@@ -9,6 +9,7 @@ import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.proctracer.dispatcher.DispatcherFactory;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 
+@SuppressWarnings("unused")
 public class ProcessMainDispatcher extends BaseProcessTracer {
     protected Set<Long> childPIDs;
 
@@ -20,14 +21,21 @@ public class ProcessMainDispatcher extends BaseProcessTracer {
                     List.of("org.yuzjlab.proctracer.dispatcher.proc.ProcessMemoryTracer"));
 
     public ProcessMainDispatcher(TracerOpts topts, long tracedPID) {
-        super(topts, false, tracedPID);
+        super(topts, tracedPID);
         this.childPIDs = new HashSet<>();
     }
 
     @Override
     protected void setUp() {
         super.setUp();
+        this.logManager.lh.info("Process dispatcher {} added", this.tracePID);
         DispatcherFactory.processSetUp(this, this.tracePID);
+    }
+
+    @Override
+    protected void tearDown() {
+        super.tearDown();
+        this.logManager.lh.info("Process dispatcher {} shutting down", this.tracePID);
     }
 
     @Override

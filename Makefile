@@ -12,8 +12,8 @@ build: fmt
 fmt:
 	./gradlew goJF
 
-.PHONY: test_main
-test_main: build
+.PHONY: test_collector
+test_collector: build
 	mkdir -p test.out.d/
 	java \
 		-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
@@ -29,6 +29,7 @@ test_main: build
 		-jar process-info-collector/build/libs/process-info-collector-1.0-SNAPSHOT-all.jar \
 		--frontend-impl LOG \
 		-o test.out.d/test_sleep \
+		--compress GZ \
 		-- sleep 5
 
 .PHONY: test

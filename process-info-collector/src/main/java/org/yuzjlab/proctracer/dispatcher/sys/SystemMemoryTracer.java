@@ -7,10 +7,11 @@ import java.util.Map;
 import org.yuzjlab.procfs.SystemInfo;
 import org.yuzjlab.procfs.exception.ProcessBaseException;
 import org.yuzjlab.procfs.files.ProcMemInfo;
-import org.yuzjlab.proctracer.dispatcher.CsvPolicy;
 import org.yuzjlab.proctracer.frontend.FrontendUtils;
 import org.yuzjlab.proctracer.opts.TracerOpts;
+import org.yuzjlab.proctracer.utils.CsvPolicy;
 
+@SuppressWarnings("unused")
 public class SystemMemoryTracer extends BaseSystemTracer {
     protected final SystemInfo sysInfo;
     protected ProcMemInfo cachedMemInfo;
@@ -48,7 +49,7 @@ public class SystemMemoryTracer extends BaseSystemTracer {
                     });
 
     public SystemMemoryTracer(TracerOpts topts) {
-        super(topts, true);
+        super(topts);
         this.sysInfo = new SystemInfo();
         this.cachedMemInfo = null;
     }
@@ -56,21 +57,10 @@ public class SystemMemoryTracer extends BaseSystemTracer {
     public static final Map<String, Object> DEFAULT_CONFIG = Map.of("interval", 0.01);
 
     @Override
-    protected void setUp() {
-        super.setUp();
-        try {
-            CSV_POLICY.writeHeader(this.csvPrinter);
-        } catch (IOException e) {
-            this.logManager.logError(e);
-            this.setShouldStop();
-        }
-    }
-
-    @Override
     protected void probe() {
         try {
             this.cachedMemInfo = sysInfo.getMemInfo();
-            this.csvPrinter.printRecord(
+            this.csvPolicy.printRecord(
                     Instant.now().toEpochMilli(),
                     this.cachedMemInfo.memTotalKBytes,
                     this.cachedMemInfo.swapTotalKBytes,

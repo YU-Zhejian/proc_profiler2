@@ -1,23 +1,21 @@
 package org.yuzjlab.proctracer.dispatcher;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.csv.CSVPrinter;
 import org.yuzjlab.proctracer.opts.TracerOpts;
 import org.yuzjlab.proctracer.utils.BaseCanStop;
 import org.yuzjlab.proctracer.utils.ConfigurationManager;
+import org.yuzjlab.proctracer.utils.CsvPolicy;
 import org.yuzjlab.proctracer.utils.LogManager;
 
 public abstract class BaseDispatcher extends BaseCanStop implements DispatcherInterface {
     protected LogManager logManager;
     protected final TracerOpts topts;
-    protected CSVPrinter csvPrinter;
     protected Map<DispatcherInterface, Thread> childDispatcherThreadMap;
     protected ConfigurationManager configurationManager;
-    private final boolean createCsvPrinter;
+    protected CsvPolicy csvPolicy;
 
     @Override
     public void setShouldStop() {
@@ -40,12 +38,11 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
         return hm;
     }
 
-    protected BaseDispatcher(TracerOpts topts, boolean createCsvPrinter) {
+    protected BaseDispatcher(TracerOpts topts) {
         this.topts = topts;
         this.configurationManager = new ConfigurationManager(topts.getConfig(), this.getClass());
-        this.createCsvPrinter = createCsvPrinter;
-
         this.childDispatcherThreadMap = new HashMap<>();
+        this.csvPolicy = getCsvPolicy(this.getClass());
     }
 
     protected abstract void probe();
@@ -53,26 +50,20 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
     protected void setUp() {
         this.logManager = new LogManager(this);
         this.logManager.lh.debug("Running setup script...");
-        if (this.createCsvPrinter) {
+        if (this.csvPolicy != null) {
             try {
-                this.csvPrinter =
-                        topts.createCSVPrinter(
-                                Path.of(topts.getOutDirPath().toString(), this.toString())
-                                        .toFile());
+                this.csvPolicy.setUp(this);
             } catch (IOException e) {
                 this.logManager.logError(e);
-                this.csvPrinter = null;
                 this.setShouldStop();
             }
-        } else {
-            this.csvPrinter = null;
         }
     }
 
     protected void tearDown() {
-        if (this.createCsvPrinter) {
+        if (this.csvPolicy != null) {
             try {
-                this.csvPrinter.close();
+                this.csvPolicy.tearDown();
             } catch (IOException e) {
                 this.logManager.logError(e);
             }
@@ -150,5 +141,23 @@ public abstract class BaseDispatcher extends BaseCanStop implements DispatcherIn
         this.logManager.lh.debug("Running termination script...");
         tearDown();
         this.logManager.lh.debug("Running termination script FIN");
+    }
+
+    public static CsvPolicy getCsvPolicy(Class<? extends DispatcherInterface> dispatcher) {
+        try {
+            var csvPolicy = dispatcher.getField("CSV_POLICY").get(null);
+            if (!(csvPolicy instanceof CsvPolicy)) {
+                throw new ClassNotFoundException(
+                        "CSV_POLICY field of class %s is not CsvPolicy!"
+                                .formatted(dispatcher.getCanonicalName()));
+            }
+            return ((CsvPolicy) csvPolicy);
+        } catch (NoSuchFieldException | IllegalAccessException | ClassNotFoundException ignored) {
+        }
+        return null;
+    }
+
+    public TracerOpts getTracerOpts() {
+        return this.topts;
     }
 }
