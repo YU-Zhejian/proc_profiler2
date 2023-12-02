@@ -2,10 +2,13 @@ package org.yuzjlab.procanalyzer;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.configuration2.ex.ConfigurationException;
+import org.apache.spark.sql.Column;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.functions;
 import org.apache.spark.sql.types.DataType;
 import org.apache.spark.sql.types.DataTypes;
 import org.apache.spark.sql.types.StructType;
@@ -15,7 +18,8 @@ public class Main {
     public static DataType getDT(String schemaName) {
         DataType dt;
         switch (schemaName) {
-            case "Time:MilliSecSinceEpoch", "Long" -> dt = DataTypes.LongType;
+            case "Time:MilliSecSinceEpoch" -> dt = DataTypes.LongType;
+            case "Long" -> dt = DataTypes.LongType;
             default -> throw new RuntimeException("Type mismatch!");
         }
         return dt;
@@ -51,6 +55,35 @@ public class Main {
                         .option("mode", "DROPMALFORMED")
                         .option("locale", "en-US")
                         .load("test.out.d/test_sleep/SystemMemoryTracer-0.tsv");
+        sdf.printSchema();
+        var startOffset = 1700489717705L;
+        var interval = 1000L; // Interval 1s
+        sdf =
+                sdf.withColumn("TIME_WITHOUT_OFFSET", functions.col("TIME").minus(startOffset))
+                        .withColumn(
+                                "TIME_GRP_ID",
+                                functions
+                                        .col("TIME_WITHOUT_OFFSET")
+                                        .divide(interval)
+                                        .cast(DataTypes.LongType));
+        var expr = new ArrayList<Column>();
+        for (var name : confHeader) {
+            if (name.equals("TIME")) {
+                continue;
+            }
+            expr.add(functions.mean(name).as(name));
+        }
+        var exprs = expr.toArray(new Column[0]);
+        sdf =
+                sdf.groupBy("TIME_GRP_ID")
+                        .agg(
+                                functions
+                                        .col("TIME_GRP_ID")
+                                        .multiply(interval)
+                                        .plus(startOffset)
+                                        .as("TIME"),
+                                exprs);
+        sdf = sdf.drop("TIME_WITHOUT_OFFSET", "TIME_GRP_ID").sort("TIME");
         sdf.show();
         spark.stop();
     }
