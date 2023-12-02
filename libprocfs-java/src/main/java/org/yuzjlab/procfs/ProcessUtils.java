@@ -13,7 +13,7 @@ import org.yuzjlab.procfs.exception.ProcessNotExistException;
 import org.yuzjlab.procfs.exception.ProcessPermissionDeniedException;
 import org.yuzjlab.procfs.exception.ProcessUnknownException;
 
-@SuppressWarnings("squid:S1075") // Supress URIs should not be hardcoded
+@SuppressWarnings("squid:S1075") // Suppress URIs should not be hardcoded
 public class ProcessUtils {
     // SonarLint: Suppress
     protected static String resolvedProcfsPath = null;
@@ -35,14 +35,18 @@ public class ProcessUtils {
             } else if (Files.exists(Path.of(procfsPath))) {
                 resolvedProcfsPath = procfsPath;
                 return resolvedProcfsPath;
-            } else {
-                lh.debug("Tried {} failed", procfsPath);
             }
+            lh.debug("Tried {} failed", procfsPath);
         }
         throw resolveIOException(
                 new FileNotFoundException("PROCFS not exist! See log for tried locations."));
     }
 
+    /**
+     * Get the current process ID
+     * @throws ProcessBaseException if the process file does not exist
+     * @throws ProcessUnknownException if the process file's PID cannot be parsed
+     */
     public static long getCurrentPid() throws ProcessBaseException {
         Path selfProcPath = null;
         if (Path.of(getProcfsPath(), "self").toFile().exists()) {

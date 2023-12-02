@@ -15,15 +15,22 @@ import org.apache.spark.sql.types.StructType;
 import org.slf4j.LoggerFactory;
 
 public class Main {
+    /**
+     * Get the data type based on the given schema name.
+     *
+     * @param schemaName the name of the schema
+     * @return the corresponding data type
+     * @throws RuntimeException if there is a type mismatch
+     */
     public static DataType getDT(String schemaName) {
-        DataType dt;
-        switch (schemaName) {
-            case "Time:MilliSecSinceEpoch" -> dt = DataTypes.LongType;
-            case "Long" -> dt = DataTypes.LongType;
+        return switch (schemaName) {
+            case "Time:MilliSecSinceEpoch", "Long" -> DataTypes.LongType;
+            case "Int" -> DataTypes.IntegerType;
+            case "Dbl" -> DataTypes.DoubleType;
             default -> throw new RuntimeException("Type mismatch!");
-        }
-        return dt;
+        };
     }
+
 
     public static void main(String[] args) throws IOException, ConfigurationException {
         var lh = LoggerFactory.getLogger("YUZJLab.ProcAnalyzer");
@@ -58,6 +65,7 @@ public class Main {
         sdf.printSchema();
         var startOffset = 1700489717705L;
         var interval = 1000L; // Interval 1s
+        startOffset -= interval * 2;
         sdf =
                 sdf.withColumn("TIME_WITHOUT_OFFSET", functions.col("TIME").minus(startOffset))
                         .withColumn(
@@ -66,6 +74,7 @@ public class Main {
                                         .col("TIME_WITHOUT_OFFSET")
                                         .divide(interval)
                                         .cast(DataTypes.LongType));
+        // Array of Aggregation Transformations
         var expr = new ArrayList<Column>();
         for (var name : confHeader) {
             if (name.equals("TIME")) {
@@ -83,7 +92,7 @@ public class Main {
                                         .plus(startOffset)
                                         .as("TIME"),
                                 exprs);
-        sdf = sdf.drop("TIME_WITHOUT_OFFSET", "TIME_GRP_ID").sort("TIME");
+        sdf = sdf.drop("TIME_WITHOUT_OFFSET").sort("TIME");
         sdf.show();
         spark.stop();
     }
