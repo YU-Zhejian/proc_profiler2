@@ -54,7 +54,7 @@ jar {
     manifest {
         attributes(
                 "Manifest-Version": 1.0,
-                'Main-Class': 'org.yuzjlab.proctracer.Main' //指定main方法所在的文件
+                'Main-Class': 'org.yuzjlab.proctracer.Main'
         )
     }
 }
