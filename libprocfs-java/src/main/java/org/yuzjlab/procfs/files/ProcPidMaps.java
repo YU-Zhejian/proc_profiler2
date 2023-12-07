@@ -28,12 +28,13 @@ public class ProcPidMaps {
     }
 
     private static String getLastToken(String line) {
-        Scanner scn = new Scanner(line);
-        String last = null;
-        while (scn.hasNext()) {
-            last = scn.next();
+        try(var scn = new Scanner(line)){
+            String last = null;
+            while (scn.hasNext()) {
+                last = scn.next();
+            }
+            return last;
         }
-        return last;
     }
 
     public static Iterable<String> parseMaps(Path pathOfMaps) throws ProcessBaseException {
